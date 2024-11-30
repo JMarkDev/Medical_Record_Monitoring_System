@@ -6,6 +6,8 @@ const bcrypt = require("bcryptjs");
 const statusList = require("../constants/statusList");
 const saltsRounds = 10;
 const otpController = require("./otpController");
+const { sendNotification } = require("../utils/emailNotifications");
+const sequelize = require("../config/database");
 
 const getUserByEmail = async (req, res) => {
   const { email } = req.query;
@@ -42,13 +44,58 @@ const getUserById = async (req, res) => {
   }
 };
 
+const approvedAccount = async (req, res) => {
+  const { id, email } = req.params;
+
+  try {
+    const [updatedCount] = await userModel.update(
+      {
+        status: statusList.approved,
+        updatedAt: createdAt,
+      },
+      {
+        where: {
+          id: id,
+        },
+      }
+    );
+
+    if (updatedCount === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found or no updates were made",
+      });
+    }
+
+    const updatedUser = await userModel.findOne({ where: { id } }); // Fetch the updated user data
+
+    await sendNotification({
+      email: email,
+      subject: "Account Approval - Medical Record Monitoring System",
+      message:
+        "Congratulations! Your account has been successfully approved. You can now log in to the Medical Record Monitoring System using your credentials.",
+    });
+
+    return res.status(200).json({
+      updatedUser, // Return the updated user data
+      status: "success",
+      message: "Account approved successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 const getAllUserByRole = async (req, res) => {
   const { role } = req.query;
   try {
     const verifiedUser = await userModel.findAll({
       where: {
         role: role,
-        status: statusList.verified,
+        [Op.or]: [
+          { status: statusList.verified },
+          { status: statusList.approved },
+        ],
       },
     });
 
@@ -83,16 +130,20 @@ const deleteUser = async (req, res) => {
 
   try {
     const user = await userModel.findByPk(id);
+    console.log(id, "id");
 
     if (!user) {
       return res.status(404).json({ Error: "User not found" });
     }
+
+    await userModel.destroy({ where: { id } });
 
     return res.status(200).json({
       status: "success",
       message: "Deleted successfully!",
     });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ Error: "Delete user error in server" });
   }
 };
@@ -108,6 +159,7 @@ const searchUser = async (req, res) => {
           { firstName: { [Op.like]: `${name}%` } },
           { lastName: { [Op.like]: `${name}%` } },
         ],
+        status: statusList.verified,
       },
     };
     const users = await userModel.findAll(searchCriteria);
@@ -120,8 +172,19 @@ const searchUser = async (req, res) => {
 
 const updateUserData = async (req, res) => {
   const { id } = req.params;
-  const { image, firstName, lastName, middleInitial, contactNumber, password } =
-    req.body;
+  const {
+    image,
+    firstName,
+    lastName,
+    middleInitial,
+    contactNumber,
+    address,
+    availability_start_day,
+    availability_end_day,
+    availability_start_time,
+    availability_end_time,
+    password,
+  } = req.body;
 
   try {
     // Fetch the officeId from the userModel
@@ -152,6 +215,11 @@ const updateUserData = async (req, res) => {
         middleInitial: middleInitial,
         contactNumber: contactNumber,
         password: hashPassword,
+        address: address,
+        availability_start_day: availability_start_day,
+        availability_end_day: availability_end_day,
+        availability_start_time: availability_start_time,
+        availability_end_time: availability_end_time,
         updatedAt: createdAt,
       },
       {
@@ -226,6 +294,9 @@ const updateProfile = async (req, res) => {
     req.body;
 
   try {
+    const createdAt = new Date();
+    const formattedDate = date.format(createdAt, "YYYY-MM-DD HH:mm:ss", true); // true for UTC time;
+
     const user = await userModel.findOne({ where: { id } });
     // upload image
     let newFileName = null;
@@ -250,7 +321,7 @@ const updateProfile = async (req, res) => {
         middleInitial: middleInitial,
         contactNumber: contactNumber,
         address: address,
-        updatedAt: createdAt,
+        updatedAt: sequelize.literal(`'${formattedDate}'`),
       },
       {
         where: { id },
@@ -269,7 +340,6 @@ const updateProfile = async (req, res) => {
 
 const updateEmail = async (req, res) => {
   const { email } = req.body;
-  console.log(email);
 
   try {
     const existUser = await userModel.findOne({
@@ -312,4 +382,5 @@ module.exports = {
   updatePassword,
   updateProfile,
   updateEmail,
+  approvedAccount,
 };
