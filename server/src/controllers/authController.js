@@ -2,6 +2,7 @@ const userModel = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const saltsRounds = 10;
 const sequelize = require("../config/database");
+const { Op } = require("sequelize");
 require("dotenv").config();
 const fs = require("fs");
 const date = require("date-and-time");
@@ -32,7 +33,11 @@ const handleRegister = async (req, res) => {
     const user = await userModel.findOne({
       where: {
         email: email,
-        status: statusList.verified,
+        [Op.or]: [
+          { status: statusList.verified },
+          { status: statusList.approved },
+        ],
+        // status: statusList.verified,
       },
     });
 
