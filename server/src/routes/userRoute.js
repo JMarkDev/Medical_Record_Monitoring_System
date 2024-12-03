@@ -7,6 +7,7 @@ const {
   registerValidationRules,
   validateForm,
   updateProfileValidation,
+  handleValidationErrors,
 } = require("../middlewares/formValidation");
 const otpController = require("../controllers/otpController");
 
@@ -19,12 +20,16 @@ router.get("/get-all-user", userController.getAllUserByRole);
 router.get("/get-user-by-role", userController.getUserByRole);
 router.delete("/delete/id/:id", userController.deleteUser);
 router.get("/search/:name/:role", userController.searchUser);
+router.put(
+  "/approved-account/id/:id/email/:email",
+  userController.approvedAccount
+);
 
 router.put(
   "/update-user-data/id/:id",
   upload.single("image"),
   registerValidationRules(),
-  validateForm,
+  handleValidationErrors,
   userController.updateUserData
 );
 

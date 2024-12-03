@@ -9,13 +9,25 @@ const Appointment = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    patientId: {
+    doctorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "patients",
+        model: "users", // Assuming doctors are stored in the Users table
         key: "id",
       },
+    },
+    fullName: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    contact_number: {
+      type: DataTypes.STRING(15),
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
     },
     doctorId: {
       type: DataTypes.INTEGER,
@@ -27,6 +39,10 @@ const Appointment = sequelize.define(
     },
     date: {
       type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    contact_number: {
+      type: DataTypes.STRING(15),
       allowNull: false,
     },
     time: {
@@ -43,17 +59,13 @@ const Appointment = sequelize.define(
       allowNull: false,
       defaultValue: "Scheduled",
     },
-    notes: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      allowNull: true,
     },
   },
   {

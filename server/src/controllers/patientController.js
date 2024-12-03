@@ -17,8 +17,8 @@ const addPatient = async (req, res) => {
     address,
     patient_insurance_provider,
     patient_insurance_id,
+    status,
   } = req.body;
-  console.log(req.body);
 
   try {
     const createdAt = new Date();
@@ -33,6 +33,7 @@ const addPatient = async (req, res) => {
       address,
       patient_insurance_provider,
       patient_insurance_id,
+      status,
       createdAt: sequelize.literal(`'${formattedDate}'`),
     });
 
@@ -48,18 +49,34 @@ const addPatient = async (req, res) => {
 };
 
 const getAllPatients = async (req, res) => {
+  const { status } = req.query;
+  const includeModels = [
+    { model: medicalHistoryModel },
+    { model: labResultModel },
+    { model: treatmentModel },
+    { model: vitalSignModel },
+  ];
+
+  let whereCondition;
+
+  if (status === "Archived") {
+    whereCondition = {
+      [Op.or]: [{ status: "Discharged" }, { status: "Transferred" }],
+    };
+  } else if (status === "Admitted") {
+    whereCondition = {
+      [Op.or]: [{ status: "Admitted" }],
+    };
+  }
+
   try {
     const patients = await patientModel.findAll({
-      include: [
-        { model: medicalHistoryModel },
-        { model: labResultModel },
-        { model: treatmentModel },
-        { model: vitalSignModel },
-      ],
+      where: whereCondition,
+      include: includeModels,
     });
     return res.status(200).json(patients);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -75,6 +92,7 @@ const updatePatient = async (req, res) => {
     address,
     patient_insurance_provider,
     patient_insurance_id,
+    status,
   } = req.body;
 
   try {
@@ -95,6 +113,7 @@ const updatePatient = async (req, res) => {
         address,
         patient_insurance_provider,
         patient_insurance_id,
+        status,
       },
       { where: { id } }
     );
@@ -102,6 +121,35 @@ const updatePatient = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "Patient updated successfully",
+      updatedPatient,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const updatePatientStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const patient = await patientModel.findOne({ where: { id } });
+
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    const updatedPatient = await patientModel.update(
+      {
+        status,
+      },
+      { where: { id } }
+    );
+
+    return res.status(200).json({
+      status: "success",
+      message: "Patient status updated successfully",
       updatedPatient,
     });
   } catch (error) {
@@ -149,7 +197,7 @@ const getPatientById = async (req, res) => {
       return res.status(404).json({ message: "Patient not found" });
     }
 
-    return res.status(200).json({ status: "success", patient });
+    return res.status(200).json(patient);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: error.message });
@@ -157,21 +205,33 @@ const getPatientById = async (req, res) => {
 };
 
 const searchPatient = async (req, res) => {
-  const { searchQuery } = req.query;
-
+  const { searchQuery = "", status } = req.query;
   try {
-    const patients = await patientModel.findAll({
-      where: {
-        [Op.or]: [
-          { firstName: { [Op.like]: `${searchQuery}%` } },
-          { lastName: { [Op.like]: `${searchQuery}%` } },
-        ],
-      },
-    });
+    // Base where condition for search query
+    const whereCondition = {
+      [Op.or]: [
+        { firstName: { [Op.like]: `${searchQuery}%` } },
+        { lastName: { [Op.like]: `${searchQuery}%` } },
+      ],
+    };
+
+    // Add status filters based on the provided status
+    if (status === "Archived") {
+      whereCondition[Op.and] = {
+        [Op.or]: [{ status: "Discharged" }, { status: "Transferred" }],
+      };
+    } else if (status === "Admitted") {
+      whereCondition[Op.and] = {
+        status: "Admitted",
+      };
+    }
+
+    // Fetch patients based on the constructed condition
+    const patients = await patientModel.findAll({ where: whereCondition });
 
     return res.status(200).json(patients);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -183,4 +243,5 @@ module.exports = {
   deletePatient,
   getPatientById,
   searchPatient,
+  updatePatientStatus,
 };

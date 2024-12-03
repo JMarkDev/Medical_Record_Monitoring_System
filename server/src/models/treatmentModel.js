@@ -60,7 +60,7 @@ const Treatment = sequelize.define(
     },
     updatedAt: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      allowNull: true,
     },
   },
   {

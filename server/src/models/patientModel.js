@@ -45,13 +45,18 @@ const Patient = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: true,
     },
+    status: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: "Admitted",
+    },
     createdAt: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      allowNull: false,
     },
     updatedAt: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      allowNull: true,
     },
   },
   {

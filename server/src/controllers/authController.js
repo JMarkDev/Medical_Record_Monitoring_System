@@ -117,7 +117,10 @@ const handleLogin = async (req, res) => {
     const user = await userModel.findOne({
       where: {
         email: email,
-        status: statusList.verified,
+        [Op.or]: [
+          { status: statusList.verified },
+          { status: statusList.approved },
+        ],
       },
     });
 

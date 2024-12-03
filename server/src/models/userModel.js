@@ -1,6 +1,7 @@
 const sequelize = require("../config/database");
 const { DataTypes } = require("sequelize");
 const Treatment = require("./treatmentModel");
+const Appointment = require("./appointmentModel");
 
 const User = sequelize.define(
   "users",
@@ -85,7 +86,25 @@ const User = sequelize.define(
   }
 );
 
-User.hasMany(Treatment, { foreignKey: "doctorId" });
-Treatment.belongsTo(User, { foreignKey: "doctorId" });
+User.hasMany(Treatment, {
+  foreignKey: "doctorId",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Treatment.belongsTo(User, {
+  foreignKey: "doctorId",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+User.hasMany(Appointment, {
+  foreignKey: "doctorId", // This should match the `doctorId` in the Appointment model
+  onDelete: "CASCADE",
+});
+
+Appointment.belongsTo(User, {
+  foreignKey: "doctorId", // Ensure this matches the `doctorId` column in Appointment
+  onDelete: "CASCADE",
+});
 
 module.exports = User;

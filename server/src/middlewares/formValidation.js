@@ -66,39 +66,6 @@ const loginValidationRules = () => {
   return [validateEmail(), validateRequiredField("password")];
 };
 
-// Validation rules for register
-// const registerValidationRules = () => {
-//   return [
-//     validateRequiredField("firstName"),
-//     validateRequiredField("lastName"),
-//     validateRequiredField("middleInitial"),
-//     validateEmail(),
-//     validateRequiredField("contactNumber"),
-//     validateRequiredField("address"),
-//     validatePassword(),
-//     body("confirmPassword").custom((value, { req }) => {
-//       if (!value) {
-//         throw new Error("Confirm password is required");
-//       }
-
-//       if (value !== req.body.password) {
-//         throw new Error("Passwords do not match");
-//       }
-//       return true;
-//     }),
-//     body("contactNumber").custom((value, { req }) => {
-//       if (!value) {
-//         throw new Error("Contact Number is required");
-//       }
-
-//       if (req.body.contactNumber && req.body.contactNumber.length !== 11) {
-//         throw new Error("Contact Number must be 11 digits");
-//       }
-//       return true;
-//     }),
-//   ];
-// };
-
 const doctorSpecificValidations = (req) => {
   const errors = [];
 
@@ -190,58 +157,17 @@ const registerValidationRules = () => {
   ];
 };
 
-// const registerValidationRules = () => {
-//   return [
-//     body("firstName").notEmpty().withMessage("First Name is required"),
-//     body("lastName").notEmpty().withMessage("Last Name is required"),
-//     body("middleInitial").notEmpty().withMessage("Middle Initial is required"),
-//     body("email").custom((value) => {
-//       if (!value) {
-//         throw new Error("Email is required");
-//       }
-//       if (!value.match(emailRegex)) {
-//         throw new Error("Enter a valid email address(e.g. sample@gmail.com).");
-//       }
-//       return true;
-//     }),
-//     body("contactNumber").notEmpty().withMessage("Contact Number is required"),
-//     body("address").notEmpty().withMessage("Address is required"),
-//     body("password")
-//       .isLength({ min: 6 })
-//       .withMessage("Password must be at least 6 characters long"),
-//     body("confirmPassword").custom((value, { req }) => {
-//       if (!value) {
-//         throw new Error("Confirm password is required");
-//       }
-
-//       if (value !== req.body.password) {
-//         throw new Error("Passwords do not match");
-//       }
-//       return true;
-//     }),
-//     body("role").custom((value, { req }) => {
-//       const role = parseInt(value, 10);
-//       if (!role) {
-//         throw new Error("Role is required");
-//       }
-
-//       // Initialize req.errors if not already initialized
-//       req.errors = req.errors || [];
-
-//       // Perform doctor-specific validations if the role is 3
-//       if (role === 3) {
-//         const errors = doctorSpecificValidations(req);
-//         if (errors.length > 0) {
-//           // Add each error to req.errors
-//           errors.forEach((err) => {
-//             req.errors.push(err);
-//           });
-//         }
-//       }
-//       return true;
-//     }),
-//   ];
-// };
+const patientValidationRules = () => {
+  return [
+    validateRequiredField("firstName"),
+    validateRequiredField("lastName"),
+    validateRequiredField("contactNumber"),
+    validateRequiredField("address"),
+    validateRequiredField("dateOfBirth"),
+    validateRequiredField("gender"),
+    validateRequiredField("status"),
+  ];
+};
 
 const handleValidationErrors = (req, res, next) => {
   // Collect all validation errors
@@ -288,4 +214,5 @@ module.exports = {
   validateEmail,
   validateForgotPassword,
   updateProfileValidation,
+  patientValidationRules,
 };

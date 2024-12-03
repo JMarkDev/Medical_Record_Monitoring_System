@@ -40,25 +40,10 @@ const VitalSigns = sequelize.define(
       allowNull: true,
       // Example: 72 (beats per minute)
     },
-    respirationRate: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      // Example: 16 (breaths per minute)
-    },
-    measurementDate: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
     measurementTime: {
       type: DataTypes.TIME,
       allowNull: false,
     },
-    notes: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      // Additional notes about the measurements
-    },
-
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

@@ -11,6 +11,9 @@ const refreshToken = require("./src/middlewares/refreshToken");
 const authRoute = require("./src/routes/authRoute");
 const userRoute = require("./src/routes/userRoute");
 const notificationRoute = require("./src/routes/notificationRoute");
+const appointmentRoute = require("./src/routes/appointmentRoute");
+const doctorsRoute = require("./src/routes/doctorsRoute");
+const patientRoute = require("./src/routes/patientRoute");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -41,6 +44,10 @@ app.get("/uploads/:filename", (req, res) => {
 // public routes no token required
 
 app.use("/auth", authRoute);
+app.use("/doctors", doctorsRoute);
+app.use("/appointment", appointmentRoute);
+app.use("/patients", patientRoute);
+
 // refresh token route
 app.post("/refresh", refreshToken, async (req, res) => {
   return res.json({ message: "refresh" });
