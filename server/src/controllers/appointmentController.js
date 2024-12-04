@@ -95,10 +95,12 @@ const updateAppointmentStatus = async (req, res) => {
     await appointment.update({ status });
 
     return res.status(200).json({
-      message: "Appointment status updated successfully",
+      status: "success",
+      message: `Appointment has been ${status}.`,
       updatedAppointment,
     });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: err.message });
   }
 };
