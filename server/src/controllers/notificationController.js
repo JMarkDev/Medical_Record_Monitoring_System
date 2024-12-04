@@ -1,7 +1,11 @@
 const notificationModel = require("../models/notificationModel");
-const { createdAt } = require("../utils/formattedTime");
+// const { createdAt } = require("../utils/formattedTime");
 const date = require("date-and-time");
 const sequelize = require("../config/database");
+const Sequelize = require("sequelize");
+const userModel = require("../models/userModel");
+const rolesList = require("../constants/rolesList");
+const statusList = require("../constants/statusList");
 
 const addNotification = async ({ document_id, content, user_id }) => {
   try {
@@ -22,14 +26,53 @@ const addNotification = async ({ document_id, content, user_id }) => {
   }
 };
 
+const newRegisterNotification = async ({ name }) => {
+  try {
+    const createdAt = new Date();
+    const formattedDate = date.format(createdAt, "YYYY-MM-DD HH:mm:ss", true); // true for UTC time;
+
+    const admin = await userModel.findAll({
+      where: {
+        role: 1,
+        [Sequelize.Op.or]: [
+          {
+            status: statusList.verified,
+          },
+          {
+            status: statusList.approved,
+          },
+        ],
+      },
+    });
+
+    await Promise.all(
+      admin?.map(async (admin) => {
+        await notificationModel.create({
+          adminId: admin.id,
+          user_id: admin.id,
+          message: `New user has registered. Please review and approve the account of ${name}.`,
+          is_read: 0,
+          createdAt: sequelize.literal(`'${formattedDate}'`),
+        });
+      })
+    );
+    return true;
+  } catch (err) {
+    throw new Error(err.message); // Throw an error if something goes wrong
+  }
+};
+
 const updateNotification = async (req, res) => {
   const { id } = req.params;
 
   try {
+    const createdAt = new Date();
+    const formattedDate = date.format(createdAt, "YYYY-MM-DD HH:mm:ss", true); // true for UTC time;
+
     const updateNotification = await notificationModel.update(
       {
         is_read: 1,
-        updatedAt: createdAt,
+        updatedAt: sequelize.literal(`'${formattedDate}'`),
       },
       {
         where: {
@@ -68,4 +111,5 @@ module.exports = {
   getNotificationById,
   addNotification,
   updateNotification,
+  newRegisterNotification,
 };
