@@ -4,7 +4,7 @@ const sequelize = require("../config/database");
 const medicalHistoryModel = require("../models/medicalHistoryModel");
 const labResultModel = require("../models/labResultModel");
 const treatmentModel = require("../models/treatmentModel");
-const vitalSignModel = require("../models/vitalSignModel");
+const vitalModel = require("../models/vitalModel");
 const { Op } = require("sequelize");
 
 const addPatient = async (req, res) => {
@@ -54,7 +54,7 @@ const getAllPatients = async (req, res) => {
     { model: medicalHistoryModel },
     { model: labResultModel },
     { model: treatmentModel },
-    { model: vitalSignModel },
+    { model: vitalModel },
   ];
 
   let whereCondition;
@@ -189,7 +189,7 @@ const getPatientById = async (req, res) => {
         { model: medicalHistoryModel },
         { model: labResultModel },
         { model: treatmentModel },
-        { model: vitalSignModel },
+        { model: vitalModel },
       ],
     });
 
