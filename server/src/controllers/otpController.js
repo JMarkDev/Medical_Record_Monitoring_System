@@ -10,6 +10,7 @@ const rolesList = require("../constants/rolesList");
 const date = require("date-and-time");
 const { sendNotification } = require("../utils/emailNotifications");
 const { Sequelize } = require("sequelize");
+const { newRegisterNotification } = require("./notificationController");
 
 const postOTP = async (email) => {
   try {
@@ -93,6 +94,10 @@ const verifyOTP = async (req, res) => {
           email,
           subject: "Medical record monitoring system Verification",
           message: message,
+        });
+
+        await newRegisterNotification({
+          name: `${firstName} ${middleInitial} ${lastName}`,
         });
       }
     } else {
