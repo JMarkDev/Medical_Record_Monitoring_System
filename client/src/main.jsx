@@ -8,11 +8,13 @@ import { ToastProvider } from "./hooks/useToast.jsx";
 import { store } from "./app/store.js";
 import { Provider } from "react-redux";
 import { fetchUser } from "./services/authSlice.js";
+import { fetchAllPatients } from "./services/patientSlice.js";
 import Cookie from "js-cookie";
 
 const token = Cookie.get("accessToken");
 
 if (token) {
+  store.dispatch(fetchAllPatients());
   store.dispatch(fetchUser());
 }
 

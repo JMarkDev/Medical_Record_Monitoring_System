@@ -15,6 +15,19 @@ export const fetchUserById = createAsyncThunk(
   }
 );
 
+export const approvedAccount = createAsyncThunk(
+  "/users/approvedAccount",
+  async ({ id, email, toast }) => {
+    const response = await axios.put(
+      `/users/approved-account/id/${id}/email/${email}`
+    );
+    if (response.data.status === "success") {
+      toast.success(response.data.message);
+      return response.data.updatedUser;
+    }
+  }
+);
+
 export const deleteUser = createAsyncThunk(
   "/users/deleteUser",
   async ({ id, toast }) => {
@@ -27,6 +40,24 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
+export const fetchAllDoctors = createAsyncThunk(
+  "users/all-doctors",
+  async () => {
+    async () => {
+      const response = await axios.get("/doctors/get-all-doctors");
+      return response.data;
+    };
+  }
+);
+
+export const fetchApprovedDoctors = createAsyncThunk(
+  "users/approved-doctors",
+  async () => {
+    const response = await axios.get("/doctors/get-approved-doctors");
+    return response.data;
+  }
+);
+
 const searchRoleUsers = (role) => {
   return createAsyncThunk(`users/search${role}`, async (name) => {
     const response = await axios.get(`/users/search/${name}/${role}`);
@@ -35,7 +66,9 @@ const searchRoleUsers = (role) => {
 };
 
 export const searchAdminRole = searchRoleUsers(rolesList.admin);
-export const searchSlaughterhouseRole = searchRoleUsers(rolesList.supervisor);
+export const searchDoctorRole = searchRoleUsers(rolesList.doctor);
+export const searchNurseRole = searchRoleUsers(rolesList.nurse);
+// export const searchSlaughterhouseRole = searchRoleUsers(rolesList.supervisor);
 
 export const filterFacultyByCampus = createAsyncThunk(
   "users/filter-faculty",
@@ -52,7 +85,7 @@ const usersSlice = createSlice({
     users: [],
     roleUsers: {
       admin: [],
-      slaughterhouse: [],
+      doctors: [],
     },
     userByid: null,
 
@@ -121,16 +154,66 @@ const usersSlice = createSlice({
         state.status.admin = "failed";
         state.error = action.error.message;
       })
-      // search slaughterhouse role
-      .addCase(searchSlaughterhouseRole.pending, (state) => {
-        state.status.slaughterhouse = "loading";
+      // search doctor role
+      .addCase(searchDoctorRole.pending, (state) => {
+        state.status.doctors = "loading";
       })
-      .addCase(searchSlaughterhouseRole.fulfilled, (state, action) => {
-        state.status.slaughterhouse = "succeeded";
+      .addCase(searchDoctorRole.fulfilled, (state, action) => {
+        state.status.doctors = "succeeded";
         state.users = action.payload;
       })
-      .addCase(searchSlaughterhouseRole.rejected, (state, action) => {
-        state.status.slaughterhouse = "failed";
+      .addCase(searchDoctorRole.rejected, (state, action) => {
+        state.status.doctors = "failed";
+        state.error = action.error.message;
+      })
+      // search nurse role
+      .addCase(searchNurseRole.pending, (state) => {
+        state.status.nurses = "loading";
+      })
+      .addCase(searchNurseRole.fulfilled, (state, action) => {
+        state.status.nurses = "succeeded";
+        state.users = action.payload;
+      })
+      .addCase(searchNurseRole.rejected, (state, action) => {
+        state.status.nurses = "failed";
+        state.error = action.error.message;
+      })
+      // GET ALL DOCTORS
+      .addCase(fetchAllDoctors.pending, (state) => {
+        state.status.doctors = "loading";
+      })
+      .addCase(fetchAllDoctors.fulfilled, (state, action) => {
+        state.status.doctors = "succeeded";
+        state.roleUsers.doctors = action.payload;
+      })
+      .addCase(fetchAllDoctors.rejected, (state, action) => {
+        state.status.doctors = "failed";
+        state.error = action.error.message;
+      })
+
+      // GET APPROVED DOCTORS
+      .addCase(fetchApprovedDoctors.pending, (state) => {
+        state.status.doctors = "loading";
+      })
+      .addCase(fetchApprovedDoctors.fulfilled, (state, action) => {
+        state.status.doctors = "succeeded";
+        state.roleUsers.doctors = action.payload;
+      })
+      .addCase(fetchApprovedDoctors.rejected, (state, action) => {
+        state.status.doctors = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(approvedAccount.pending, (state) => {
+        state.status.users = "loading";
+      })
+      .addCase(approvedAccount.fulfilled, (state, action) => {
+        state.status.users = "succeeded";
+        state.users = state.users.map((user) =>
+          user.id === action.payload.id ? action.payload : user
+        );
+      })
+      .addCase(approvedAccount.rejected, (state, action) => {
+        state.status.users = "failed";
         state.error = action.error.message;
       });
   },
@@ -151,6 +234,7 @@ export const getRoleStatus = (role) => (state) => state.users.status[role];
 
 export const getFilterStatus = (state) => state.users.state.filter;
 export const getSearchStatus = (state) => state.user.state.search;
+export const getDoctors = (state) => state.users.roleUsers.doctors;
 
 export const { clearUser } = usersSlice.actions;
 

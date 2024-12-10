@@ -14,49 +14,65 @@ export default function App({ data }) {
   // Safely transform data for the chart
   const transformedData = Array.isArray(data)
     ? data.map((item) => ({
-        date: item.slaughterDate || "Unknown Date", // Use slaughterDate or fallback
-        pricePerKg: item.pricePerKg || 0, // Default to 0 if missing
-        total: item.total || 0, // Default to 0 if missing
-        weight: item.weight || 0, // Optional: Use 0 if missing
+        date: new Date(item.createdAt).toLocaleDateString(), // Convert createdAt to readable date
+        status: item.status || "Unknown Status", // Fallback if missing
+        gender: item.gender || "Unknown Gender", // Fallback if missing
+        id: item.id, // Optional for reference
       }))
     : [];
 
-  // Custom Tooltip Formatter
-  const tooltipFormatter = (value, name) => {
-    if (name === "Price Per Kg" || name === "Total") {
-      return `₱${value.toLocaleString()}`; // Add peso sign and format
+  // Aggregating data for the chart
+  const chartData = transformedData.reduce((acc, item) => {
+    const existing = acc.find((entry) => entry.date === item.date);
+    if (existing) {
+      existing.totalPatients += 1;
+      existing[item.status] = (existing[item.status] || 0) + 1;
+      existing[item.gender] = (existing[item.gender] || 0) + 1;
+    } else {
+      acc.push({
+        date: item.date,
+        totalPatients: 1,
+        [item.status]: 1,
+        [item.gender]: 1,
+      });
     }
-    return value; // Return raw value for other fields (like weight)
-  };
+    return acc;
+  }, []);
 
   return (
     <div className="overflow-x-auto shadow-xl">
       <div style={{ minWidth: "800px" }}>
         <ResponsiveContainer width="100%" height={400}>
-          <LineChart width={800} height={400} data={transformedData}>
+          <LineChart width={800} height={400} data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" padding={{ left: 30, right: 30 }} />
             <YAxis />
-            <Tooltip formatter={tooltipFormatter} /> {/* Custom formatter */}
+            <Tooltip />
             <Legend />
             <Line
               type="monotone"
-              dataKey="pricePerKg"
+              dataKey="totalPatients"
               stroke="#8884d8"
-              name="Price Per Kg"
+              name="Total Patients"
               activeDot={{ r: 8 }}
             />
             <Line
               type="monotone"
-              dataKey="total"
+              dataKey="Discharged"
               stroke="#82ca9d"
-              name="Total"
+              name="Discharged"
             />
             <Line
               type="monotone"
-              dataKey="weight"
+              dataKey="Male"
               stroke="#ff7300"
-              name="Weight"
+              name="Male Patients"
+            />
+            <Line
+              type="monotone"
+              dataKey="Female"
+              stroke="#8884d8"
+              name="Female Patients"
             />
           </LineChart>
         </ResponsiveContainer>
@@ -66,5 +82,5 @@ export default function App({ data }) {
 }
 
 App.propTypes = {
-  data: PropTypes.array,
+  data: PropTypes.array.isRequired,
 };

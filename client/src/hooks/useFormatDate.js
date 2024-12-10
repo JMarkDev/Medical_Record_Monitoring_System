@@ -49,7 +49,7 @@ export const useFormat = () => {
       if (!isNaN(parsedDate)) {
         const localDate = parsedDate.toLocaleString("en-US", {
           timeZone: "Asia/Manila", // Set to your local time zone (Philippine Standard Time)
-          month: "long",
+          month: "short",
           day: "numeric",
           year: "numeric",
         });
@@ -59,6 +59,21 @@ export const useFormat = () => {
     }
   };
 
-  return { dateFormat, fullDateFormat };
+  const formatTime = (time) => {
+    if (time) {
+      // Split the time string (e.g., "14:57:00")
+      const [hours, minutes] = time.split(":");
+
+      // Convert to a 12-hour format
+      const hour12 = hours % 12 || 12; // Convert 0 to 12 for midnight
+      const period = hours >= 12 ? "PM" : "AM"; // Determine AM or PM
+
+      // Return the formatted time
+      return `${hour12}:${minutes} ${period}`;
+    }
+    return ""; // Return an empty string if no time is provided
+  };
+
+  return { dateFormat, fullDateFormat, formatTime };
 };
 export default useFormat;

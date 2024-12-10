@@ -50,6 +50,14 @@
   height: 10px;
 }
 
+.audio-analyser canvas {
+  display: none;
+}
+
+canvas {
+  display: none !important; /* Hides the canvas */
+}
+
 /* Track */
 ::-webkit-scrollbar-track {
   background: #f1f1f1;

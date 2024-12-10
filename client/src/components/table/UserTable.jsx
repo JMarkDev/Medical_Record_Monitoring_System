@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FaEye, FaRegEdit, FaTrashAlt } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaEye, FaRegEdit, FaCheckCircle, FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import ProfileModal from "../ProfileModal";
@@ -7,10 +7,14 @@ import api from "../../api/axios";
 import userIcon from "../../assets/images/user (1).png";
 import DeleteModal from "../DeleteModal";
 import { useDispatch } from "react-redux";
-import { deleteUser } from "../../services/usersSlice";
+import { deleteUser, approvedAccount } from "../../services/usersSlice";
 import { toastUtils } from "../../hooks/useToast";
 import UpdateUser from "../../pages/Admin/UserManagement/UpdateUser";
 import NoData from "../NoData";
+import statusList from "../../constants/statusList";
+import { getStatus } from "../../utils/getStatus";
+import Loading from "../loader/loginloader/LoginLoading";
+import rolesList from "../../constants/rolesList";
 
 const UserTable = ({ users, fetchUpdate }) => {
   const navigate = useNavigate();
@@ -18,10 +22,22 @@ const UserTable = ({ users, fetchUpdate }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [deleteModal, setDeleteModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [selectedEsuCampus, setSelectedEsuCampus] = useState(null);
   const [name, setName] = useState("");
   const [editModal, setEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isDoctor, setIsDoctor] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (users.length > 0) {
+      const isDoctor = users.some((user) => user.role === rolesList.doctor);
+      setIsDoctor(isDoctor);
+
+      const isAdmin = users.some((user) => user.role === rolesList.admin);
+      setIsAdmin(isAdmin);
+    }
+  }, [users]);
 
   const openModal = (image) => {
     setSelectedImage(image);
@@ -35,13 +51,14 @@ const UserTable = ({ users, fetchUpdate }) => {
 
   const openDeleteModal = ({ id, name }) => {
     setName(name);
-    setSelectedEsuCampus(id);
+    setSelectedUser(id);
+    // setSelectedEsuCampus(id);
     setDeleteModal(true);
   };
 
   const closeDeleteModal = () => {
     setDeleteModal(false);
-    setSelectedEsuCampus(null);
+    // setSelectedEsuCampus(null);
   };
 
   const openEditModal = (id) => {
@@ -54,11 +71,30 @@ const UserTable = ({ users, fetchUpdate }) => {
   };
 
   const handleDelete = () => {
-    dispatch(deleteUser({ id: selectedEsuCampus, toast: toastUtils() }));
+    dispatch(deleteUser({ id: selectedUser, toast: toastUtils() }));
     closeDeleteModal();
   };
+
+  const handleApprove = ({ id, email }) => {
+    setLoading(true);
+    dispatch(approvedAccount({ id, email, toast: toastUtils() }))
+      .unwrap()
+      .then(() => {
+        setLoading(false);
+        if (fetchUpdate) {
+          fetchUpdate();
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.log(error);
+      });
+  };
+
   return (
     <>
+      {" "}
+      <div className="flex justify-center">{loading && <Loading />}</div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {users.length === 0 ? (
           <NoData />
@@ -81,6 +117,14 @@ const UserTable = ({ users, fetchUpdate }) => {
                     FULL NAME
                   </div>
                 </th>
+                {isDoctor && (
+                  <th scope="col" className="px-4 py-3 whitespace-nowrap">
+                    <div className="flex items-center  whitespace-nowrap">
+                      SPECIALIZATION
+                    </div>
+                  </th>
+                )}
+
                 <th scope="col" className="px-4 py-3">
                   <div className="flex items-center  whitespace-nowrap">
                     CONTACT NUMBER
@@ -91,11 +135,19 @@ const UserTable = ({ users, fetchUpdate }) => {
                     EMAIL
                   </div>
                 </th>
-                <th scope="col" className="px-4 py-3">
-                  <div className="flex items-center  whitespace-nowrap">
+                {/* <th scope="col" className="px-4 py-3">
+                  <div className="flex items-center text-ellipsis whitespace-nowrap">
                     ADDRESS
                   </div>
-                </th>
+                </th> */}
+                {!isAdmin && (
+                  <th scope="col" className="px-4 py-3">
+                    <div className="flex items-center  whitespace-nowrap">
+                      STATUS
+                    </div>
+                  </th>
+                )}
+
                 <th scope="col" className="px-4 py-3 ">
                   <div className="flex items-center justify-center  whitespace-nowrap">
                     ACTION
@@ -114,7 +166,9 @@ const UserTable = ({ users, fetchUpdate }) => {
                     image,
                     contactNumber,
                     email,
-                    address,
+                    // address,
+                    status,
+                    specialization,
                   },
                   index
                 ) => (
@@ -153,16 +207,51 @@ const UserTable = ({ users, fetchUpdate }) => {
                     </th>
 
                     <td className="px-4 py-4 whitespace-nowrap">{`${firstName} ${middleInitial}. ${lastName}`}</td>
-
+                    {isDoctor && (
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        {specialization}
+                      </td>
+                    )}
                     <td className="px-4 py-4 whitespace-nowrap">
                       {contactNumber}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">{email}</td>
-                    <td className="px-4 py-4 whitespace-nowrap overflow-hidden text-ellipsis max-w-xs">
+                    {/* <td className="px-4 py-4 whitespace-nowrap overflow-hidden text-ellipsis max-w-xs">
                       {address}
-                    </td>
+                    </td> */}
+                    {!isAdmin && (
+                      <td className="px-4 py-4 whitespace-nowrap overflow-hidden text-ellipsis max-w-xs">
+                        <span
+                          className={`${
+                            status === statusList.verified
+                              ? "bg-[#f3e887]"
+                              : "bg-green-400"
+                          }  text-gray-700 p-2 px-4 rounded-lg`}
+                        >
+                          {status === statusList.verified
+                            ? "pending"
+                            : getStatus(status)}
+                        </span>
+                      </td>
+                    )}
 
                     <td className="px-4 py-4 flex gap-3 justify-center items-center">
+                      {!isAdmin && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleApprove({ id, email });
+                          }}
+                          className={`${
+                            status === statusList.verified
+                              ? "vissible"
+                              : "invisible"
+                          } p-2 text-lg bg-green-500 hover:bg-green-800 text-white rounded-lg`}
+                        >
+                          <FaCheckCircle className="h-5 w-5" />
+                        </button>
+                      )}
+
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

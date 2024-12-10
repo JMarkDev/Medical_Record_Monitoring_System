@@ -3,12 +3,14 @@ import { logoutUser } from "../../services/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserData } from "../../services/authSlice";
 import { Link, useLocation } from "react-router-dom";
-import { FaUsers } from "react-icons/fa";
+import { FaUsers, FaFileArchive } from "react-icons/fa";
 import {
   TbReportAnalytics,
   TbReport,
   TbTransactionDollar,
 } from "react-icons/tb";
+import { MdEventAvailable } from "react-icons/md";
+
 import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import { RiPieChart2Fill } from "react-icons/ri";
 import { BiLogOut } from "react-icons/bi";
@@ -16,6 +18,7 @@ import { FiChevronDown, FiChevronRight } from "react-icons/fi";
 import Logo from "../../assets/images/logo.png";
 import PropTypes from "prop-types";
 import rolesList from "../../constants/rolesList";
+// import { IoSettingsSharp } from "react-icons/io5";
 
 const Sidebar = ({ sidebar, handleBurger }) => {
   const dispatch = useDispatch();
@@ -30,62 +33,95 @@ const Sidebar = ({ sidebar, handleBurger }) => {
   const adminLinks = [
     { title: "Dashboard", path: "/admin-dashboard", src: <RiPieChart2Fill /> },
     {
-      title: "All Transaction",
-      path: "/transaction",
-      src: <TbTransactionDollar />,
-    },
-    {
-      title: "Slaughterhouse Records",
-      path: "/slaughterhouse-records",
-      src: <TbReportAnalytics />,
-    },
-    {
-      title: "Animal Records",
-      path: "/",
+      title: "Patient Records",
+      path: "/patient-records",
       src: <HiOutlineClipboardDocumentList />,
-      sublinks: [
-        { title: "Cattle", path: "/cattle" },
-        { title: "Pigs", path: "/pigs" },
-        { title: "Goats", path: "/goats" },
-      ],
+    },
+    {
+      title: "Appointments",
+      path: "/admin-appointments",
+      src: <MdEventAvailable />,
     },
     {
       title: "User Management",
       path: "/users",
       src: <FaUsers />,
       sublinks: [
+        { title: "Nurse", path: "/nurse" },
+        { title: "Doctor", path: "/doctor" },
         { title: "Admin", path: "/admin" },
-        { title: "Supervisor", path: "/supervisor" },
       ],
     },
-
     { title: "Reports", path: "/reports", src: <TbReport /> },
+    {
+      title: "Archive",
+      path: "/archive",
+      src: <FaFileArchive />,
+    },
   ];
-
-  const slaughterhouseLinks = [
+  const doctorLinks = [
     {
       title: "Dashboard",
-      path: "/slaughterhouse-dashboard",
+      path: "/doctor-dashboard",
       src: <RiPieChart2Fill />,
     },
     {
-      title: "Animal Records",
-      path: "/animal-records",
+      title: "Patient Records",
+      path: "/doctor/patient-records",
       src: <HiOutlineClipboardDocumentList />,
     },
     {
-      title: "Transaction",
-      path: "/slaughterhouse-transaction",
+      title: "Appointment",
+      path: "/doctor/appointment",
+      src: <MdEventAvailable />,
+    },
+    {
+      title: "Prescription",
+      path: "/doctor/prescription",
+      src: <TbReportAnalytics />,
+    },
+    {
+      title: "Reports",
+      path: "/doctor/reports",
+      src: <TbReport />,
+    },
+  ];
+
+  const nurseLinks = [
+    {
+      title: "Dashboard",
+      path: "/nurse-dashboard",
+      src: <RiPieChart2Fill />,
+    },
+    {
+      title: "Patient Records",
+      path: "/nurse/patient-records",
+      src: <HiOutlineClipboardDocumentList />,
+    },
+    {
+      title: "Medication",
+      path: "/nurse/medication",
+      src: <HiOutlineClipboardDocumentList />,
+    },
+    {
+      title: "Prescription",
+      path: "/nurse/prescription",
       src: <TbTransactionDollar />,
     },
-    { title: "Reports", path: "/slaughterhouse-reports", src: <TbReport /> },
+    {
+      title: "Reports",
+      path: "/nurse/reports",
+      src: <TbReport />,
+    },
   ];
 
   useEffect(() => {
     if (role === rolesList.admin) {
       setSidebarLinks(adminLinks);
-    } else if (role === rolesList.supervisor) {
-      setSidebarLinks(slaughterhouseLinks);
+    } else if (role === rolesList.doctor) {
+      setSidebarLinks(doctorLinks);
+    } else if (role === rolesList.nurse) {
+      setSidebarLinks(nurseLinks);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -113,7 +149,7 @@ const Sidebar = ({ sidebar, handleBurger }) => {
         } md:translate-x-0 md:relative md:transform-none`}
         aria-label="Sidebar"
       >
-        <div className="fixed w-64 h-full px-3 py-4 overflow-y-auto bg-main  rounded-xl dark:bg-gray-800 ">
+        <div className="fixed w-64 h-full px-3 py-4 overflow-y-auto bg-primary  rounded-xl dark:bg-gray-800 ">
           <Link
             to="/dashboard"
             className="flex items-center justify-center ps-2.5 mb-5"

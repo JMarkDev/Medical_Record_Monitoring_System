@@ -40,22 +40,10 @@ const NavDashboard = ({ handleBurger }) => {
     "/dashboard": "Dashboard",
     "/user-management": "User Management",
     "/user-profile": "User Profile",
-    "/slaughterhouse-records": "Slaughterhouse Records",
-    "/cattle": "Animal Records",
-    "/pigs": "Animal Records",
-    "/goats": "Animal Records",
-    "/city-admin": "City Admin",
-    "/transaction": "Transactions",
     "/reports": "Reports",
-
-    "/slaughterhouse-dashboard": "Slaughter Dashboard",
-    "/slaughterhouse-transaction": "Transactions",
-    "/slaughterhouse-cattle": "Animal Records",
-    "/slaughterhouse-pigs": "Animal Records",
-    "/slaughterhouse-goats": "Animal Records",
-    "/slaughterhouse-reports": "Slaughterhouse Reports",
-
-    "/supervisor": "Supervisor List",
+    "/patient-records": "Patient Records",
+    "/nurse": "Nurse List",
+    "/doctor": "Doctor List",
     "/admin": "Admin List",
     "/user-details": "User Details",
   };
@@ -121,7 +109,7 @@ const NavDashboard = ({ handleBurger }) => {
     }, 1000);
   };
   return (
-    <div className="w-full z-20 md:w-[calc(100vw-16rem)] flex gap-5 items-center px-4 flex-grow fixed h-16 bg-gray-300">
+    <div className="w-full z-20 md:w-[calc(100vw-16rem)] flex gap-5 items-center px-4 flex-grow fixed h-16 bg-white shadow-lg">
       <button
         onClick={handleBurger}
         aria-controls="logo-sidebar"

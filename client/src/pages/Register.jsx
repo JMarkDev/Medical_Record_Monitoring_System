@@ -190,7 +190,7 @@ const Register = () => {
         {verifyOTP ? (
           <VerifyOTP email={email} />
         ) : (
-          <div className="bg-white   flex flex-col justify-center items-center my-5 py-4 px-6 rounded shadow-lg min-w-[450px] mx-5">
+          <div className="bg-white   flex flex-col justify-center items-center my-5 py-4 px-6 rounded shadow-lg sm:w-[450px] w-full mx-5">
             <h1 className="text-3xl font-bold font-poppins text-primary py-2">
               Sign up your account
             </h1>
@@ -342,9 +342,7 @@ const Register = () => {
                     <div className="flex w-full flex-col">
                       <div className="relative">
                         <select
-                          {...register("specialization", {
-                            required: "Specialization is required",
-                          })}
+                          {...register("specialization")}
                           id="specialization"
                           className={`${
                             specializationError

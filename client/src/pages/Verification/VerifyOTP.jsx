@@ -7,6 +7,10 @@ import api from "../../api/axios";
 import LoginLoading from "../../components/loader/loginloader/LoginLoading";
 import { useToast } from "../../hooks/useToast";
 import "react-toastify/dist/ReactToastify.css";
+
+import io from "socket.io-client";
+const socket = io.connect(`${api.defaults.baseURL}`);
+
 const VerifyOTP = ({ email, onVerificationSuccess }) => {
   const toast = useToast();
   const navigate = useNavigate();
@@ -44,6 +48,7 @@ const VerifyOTP = ({ email, onVerificationSuccess }) => {
       });
 
       if (response.data.status === "success") {
+        socket.emit("new_notification", response.data);
         // fetch the latest added data
         if (onVerificationSuccess) {
           onVerificationSuccess();

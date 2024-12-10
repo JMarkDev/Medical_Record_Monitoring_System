@@ -7,10 +7,12 @@ export const getUserRole = (role) => {
     case rolesList.admin:
       userRole = "Admin";
       break;
-    case rolesList.supervisor:
-      userRole = "Supervisor";
+    case rolesList.doctor:
+      userRole = "Doctor";
       break;
-
+    case rolesList.nurse:
+      userRole = "Nurse";
+      break;
     default:
       break;
   }

@@ -3,11 +3,16 @@ import Cookie from "js-cookie";
 
 // Create an instance of axios
 const api = axios.create({
-  baseURL: "http://localhost:3001",
-  // baseURL: "http://192.168.1.8:3001",
+  // baseURL: "http://localhost:3001",
+  baseURL: "https://healthcare-medical-record-server.tarakabataan.com",
+  // baseURL: "https://zp77sd4z-3001.asse.devtunnels.ms",
+  // baseURL: "http://192.168.1.9:3001", // use this when run in mobile phone or other device  check ipconfig in pc first
   withCredentials: true,
 });
-
+// const api = axios.create({
+//   baseURL: "https://5079-122-54-34-194.ngrok-free.app", // Use ngrok's HTTPS URL
+//   withCredentials: true,
+// });
 // Request interceptor to include the token
 api.interceptors.request.use(
   (config) => {

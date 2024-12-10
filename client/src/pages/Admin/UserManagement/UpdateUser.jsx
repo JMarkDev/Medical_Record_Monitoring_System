@@ -14,15 +14,17 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import ChangeEmail from "../../Shared/ChangeEmail";
 import LocationInput from "../../../components/Location";
+import rolesList from "../../../constants/rolesList";
 
 const UpdateUser = ({ modal, closeModal, id, fetchUpdate }) => {
   const dispatch = useDispatch();
   const [showPass, setShowPass] = useState(false);
   const toast = useToast();
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue, watch } = useForm();
   const [loading, setLoading] = useState(false);
   const updateUser = useSelector(getFetchedUserById);
   const [location, setLocation] = useState("");
+  const [role, setRole] = useState();
   // Error state for backend validation messages
   const [firstnameError, setFirstnameError] = useState("");
   const [lastnameError, setLastnameError] = useState("");
@@ -33,6 +35,11 @@ const UpdateUser = ({ modal, closeModal, id, fetchUpdate }) => {
   const [confirmPasswordError, setConfirmpasswordError] = useState("");
   const [changeEmail, setChangeEmail] = useState(false);
   const [customerAddressError, setCustomerAddressError] = useState("");
+  const [specializationError, setSpecializationError] = useState("");
+  const [start_dayError, setAvailability_start_dayError] = useState("");
+  const [end_dayError, setAvailability_end_dayError] = useState("");
+  const [start_timeError, setAvailability_start_timeError] = useState("");
+  const [end_timeError, setAvailability_end_timeError] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -58,18 +65,34 @@ const UpdateUser = ({ modal, closeModal, id, fetchUpdate }) => {
     setPasswordError("");
     setConfirmpasswordError("");
     setCustomerAddressError("");
+    setSpecializationError("");
+    setAvailability_start_dayError("");
+    setAvailability_end_dayError("");
+    setAvailability_start_timeError("");
+    setAvailability_end_timeError("");
 
     try {
       const formData = new FormData();
       formData.append("firstName", data.firstName);
       formData.append("lastName", data.lastName);
       formData.append("middleInitial", data.middleInitial);
-      formData.append("email", updateUser.email);
+      formData.append("email", data.email);
       formData.append("contactNumber", data.contactNumber);
       formData.append("password", data.password);
       formData.append("confirmPassword", data.confirmPassword);
       formData.append("image", data.image); // Append the file
       formData.append("address", location);
+      formData.append("role", data.role);
+      if (role === rolesList.doctor) {
+        formData.append("specialization", data.specialization);
+        formData.append("availability_start_day", data.availability_start_day);
+        formData.append("availability_end_day", data.availability_end_day);
+        formData.append(
+          "availability_start_time",
+          data.availability_start_time
+        );
+        formData.append("availability_end_time", data.availability_end_time);
+      }
 
       const response = await api.put(
         `/users/update-user-data/id/${id}`,
@@ -115,6 +138,21 @@ const UpdateUser = ({ modal, closeModal, id, fetchUpdate }) => {
             case "confirmPassword":
               setConfirmpasswordError(error.msg);
               break;
+            case "specialization":
+              setSpecializationError(error.msg);
+              break;
+            case "availability_start_day":
+              setAvailability_start_dayError(error.msg);
+              break;
+            case "availability_end_day":
+              setAvailability_end_dayError(error.msg);
+              break;
+            case "availability_start_time":
+              setAvailability_start_timeError(error.msg);
+              break;
+            case "availability_end_time":
+              setAvailability_end_timeError(error.msg);
+              break;
             default:
               console.log(error);
           }
@@ -139,10 +177,18 @@ const UpdateUser = ({ modal, closeModal, id, fetchUpdate }) => {
       setValue("lastName", updateUser.lastName);
       setValue("middleInitial", updateUser.middleInitial);
       setValue("email", updateUser.email);
-      setValue("birthDate", updateUser.birthDate);
       setValue("contactNumber", updateUser.contactNumber);
-      setValue("designation", updateUser.designation);
       setValue("address", updateUser.address);
+      setValue("role", updateUser.role);
+      setValue("location", updateUser.address);
+      setRole(updateUser.role);
+      if (updateUser.role === rolesList.doctor) {
+        setValue("specialization", updateUser.specialization);
+        setValue("availability_start_day", updateUser.availability_start_day);
+        setValue("availability_end_day", updateUser.availability_end_day);
+        setValue("availability_start_time", updateUser.availability_start_time);
+        setValue("availability_end_time", updateUser.availability_end_time);
+      }
       setLocation(updateUser.address);
     }
   }, [updateUser, setValue]);
@@ -208,9 +254,6 @@ const UpdateUser = ({ modal, closeModal, id, fetchUpdate }) => {
                     <Profile setValue={setValue} image={updateUser?.image} />
                   </div>
 
-                  <h1 className="mt-4 text-lg font-bold text-gray-700">
-                    User Account
-                  </h1>
                   <div className="flex justify-between md:flex-row flex-col gap-4 mt-4">
                     <div className="flex flex-col">
                       <div className="relative">
@@ -344,6 +387,239 @@ const UpdateUser = ({ modal, closeModal, id, fetchUpdate }) => {
                     )}
                   </div>
 
+                  {role === rolesList.doctor && (
+                    <>
+                      <div className="flex mt-4 flex-col">
+                        <div className="flex w-full flex-col">
+                          <div className="relative">
+                            <select
+                              {...register("specialization")}
+                              id="specialization"
+                              className={`${
+                                specializationError
+                                  ? "border-red-500"
+                                  : "border-gray-300"
+                              } block pb-2 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
+                              defaultValue=""
+                            >
+                              <option value="" disabled>
+                                Select Specialization
+                              </option>
+                              <option value="Cardiologist">
+                                Cardiologist (Heart)
+                              </option>
+                              <option value="Hepatologist">
+                                Hepatologist (Liver)
+                              </option>
+                              <option value="Pulmonologist">
+                                Pulmonologist (Lungs)
+                              </option>
+                              <option value="Nephrologist">
+                                Nephrologist (Kidneys)
+                              </option>
+                              <option value="Endocrinologist">
+                                Endocrinologist (Diabetes, Hormones)
+                              </option>
+                              <option value="Gastroenterologist">
+                                Gastroenterologist (Digestive System)
+                              </option>
+                              <option value="Oncologist">
+                                Oncologist (Cancer)
+                              </option>
+                              <option value="Pediatrician">
+                                Pediatrician (Children)
+                              </option>
+                              <option value="OB-GYN">
+                                OB-GYN (Women’s Health)
+                              </option>
+                              <option value="General Practitioner">
+                                General Practitioner
+                              </option>
+                              <option value="Family Medicine Specialist">
+                                Family Medicine Specialist
+                              </option>
+                              <option value="Infectious Disease Specialist">
+                                Infectious Disease Specialist
+                              </option>
+                              <option value="Internal Medicine Specialist">
+                                Internal Medicine Specialist
+                              </option>
+                              <option value="Dermatologist">
+                                Dermatologist (Skin)
+                              </option>
+                              <option value="Neurologist">
+                                Neurologist (Brain, Nerves)
+                              </option>
+                              <option value="Orthopedic Surgeon">
+                                Orthopedic Surgeon (Bones, Joints)
+                              </option>
+                              <option value="Ophthalmologist">
+                                Ophthalmologist (Eyes)
+                              </option>
+                              <option value="ENT Specialist">
+                                ENT Specialist (Ear, Nose, Throat)
+                              </option>
+                              <option value="Psychiatrist">
+                                Psychiatrist (Mental Health)
+                              </option>
+                              <option value="Surgeon">General Surgeon</option>
+                              <option value="Pathologist">
+                                Pathologist (Diagnostics)
+                              </option>
+                            </select>
+                            <label
+                              htmlFor="specialization"
+                              className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+                            >
+                              Specialization
+                            </label>
+                          </div>
+                          {specializationError && (
+                            <span className="text-red-500">
+                              {specializationError}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mt-4">
+                          {/* Day Selection */}
+                          <div className="flex flex-row w-full items-center gap-5">
+                            <div className="relative w-full">
+                              <select
+                                {...register("availability_start_day")}
+                                id="availability_start_day"
+                                className={`${
+                                  start_dayError
+                                    ? "border-red-500 "
+                                    : "border-gray-300 "
+                                } block w-full pb-2 pt-4  text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none   focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
+                                value={watch("availability_start_day") || ""}
+                                placeholder=" "
+                              >
+                                <option value="" disabled>
+                                  Select Start Day
+                                </option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                                <option value="Sunday">Sunday</option>
+                              </select>
+                              <label
+                                htmlFor="availability_start_day"
+                                className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+                              >
+                                Availability Start Day
+                              </label>
+                              {start_dayError && (
+                                <span className="text-red-500">
+                                  {start_dayError}
+                                </span>
+                              )}
+                            </div>
+                            to
+                            <div className="relative w-full">
+                              <select
+                                {...register("availability_end_day")}
+                                id="availability_end_day"
+                                className={`${
+                                  end_dayError
+                                    ? "border-red-500 "
+                                    : "border-gray-300 "
+                                } block pb-2 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none   focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
+                                placeholder=" "
+                                value={watch("availability_end_day") || ""}
+                              >
+                                <option value="" disabled>
+                                  Select End Day
+                                </option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                                <option value="Sunday">Sunday</option>
+                              </select>
+                              <label
+                                htmlFor="availability_end_day"
+                                className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+                              >
+                                End Availability Day
+                              </label>
+                              {end_dayError && (
+                                <span className="text-red-500">
+                                  {end_dayError}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex mt-4 flex-col">
+                        <div className="mt-4">
+                          {/* Day Selection */}
+                          <div className="flex flex-row w-full items-center gap-5">
+                            <div className="relative w-full">
+                              <input
+                                {...register("availability_start_time")}
+                                id="availability_start_time"
+                                type="time"
+                                className={`${
+                                  start_timeError
+                                    ? "border-red-500 "
+                                    : "border-gray-300 "
+                                } block w-full pb-2 pt-4  text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none   focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
+                                placeholder=" "
+                              />
+
+                              <label
+                                htmlFor="availability_start_time"
+                                className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+                              >
+                                Availability Start time
+                              </label>
+                              {start_timeError && (
+                                <span className="text-red-500">
+                                  {start_timeError}
+                                </span>
+                              )}
+                            </div>
+                            to
+                            <div className="relative w-full">
+                              <input
+                                {...register("availability_end_time")}
+                                id="availability_end_time"
+                                type="time"
+                                className={`${
+                                  end_timeError
+                                    ? "border-red-500 "
+                                    : "border-gray-300 "
+                                } block pb-2 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none   focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
+                                placeholder=" "
+                              />
+
+                              <label
+                                htmlFor="availability_end_time"
+                                className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+                              >
+                                End Availability Time
+                              </label>
+                              {end_timeError && (
+                                <span className="text-red-500">
+                                  {end_timeError}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
                   <div className="mt-4 relative">
                     {/* <label
                       htmlFor="name"
@@ -429,7 +705,7 @@ const UpdateUser = ({ modal, closeModal, id, fetchUpdate }) => {
                     type="submit"
                     className={`${
                       loading ? "cursor-not-allowed" : "cursor-pointer"
-                    } w-full  mt-6 p-2 bg-main hover:bg-main_hover text-[#fff] md:text-lg text-sm rounded-lg`}
+                    } w-full  mt-6 p-2 bg-primary hover:bg-primary_hover text-[#fff] md:text-lg text-sm rounded-lg`}
                   >
                     Update
                   </button>

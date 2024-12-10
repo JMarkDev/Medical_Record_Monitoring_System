@@ -61,8 +61,10 @@ const Login = () => {
           let path = "";
           if (role === rolesList.admin) {
             path = "/admin-dashboard";
-          } else {
-            path = "/slaughterhouse-dashboard";
+          } else if (role === rolesList.doctor) {
+            path = "/doctor-dashboard";
+          } else if (role === rolesList.nurse) {
+            path = "/nurse-dashboard";
           }
           navigate(path);
         }
@@ -92,7 +94,7 @@ const Login = () => {
       <div className="h-screen  relative w-full flex items-center flex-col bg-gray-50">
         <Navbar />
 
-        <div className="bg-white  flex flex-col justify-center items-center mt-5 p-6 rounded shadow-lg min-w-[450px] mx-5">
+        <div className="bg-white  flex flex-col justify-center items-center mt-5 p-6 rounded shadow-lg sm:w-[450px] w-full mx-5">
           {isLoading && <LoginLoading />}
 
           <h1 className="text-3xl font-bold font-poppins text-primary ">

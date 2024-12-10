@@ -144,9 +144,12 @@ const Navbar = () => {
           <div className="lg:hidden block">
             <div className="relative  flex items-center space-x-4">
               {/* Notifications */}
-              <div className="relative">
+              <div className="relative ">
                 {unread > 0 && (
-                  <span className="absolute right-0 top-0 text-white bg-red-600 rounded-full px-1.5 text-sm">
+                  <span
+                    onClick={handleNotification}
+                    className="absolute cursor-pointer right-0 top-[-6px] text-white bg-red-600 rounded-full px-1.5 text-sm"
+                  >
                     {unread}
                   </span>
                 )}
@@ -201,7 +204,10 @@ const Navbar = () => {
             <>
               <div className="relative">
                 {unread > 0 && (
-                  <span className="absolute right-0 top-0 text-white bg-red-600 rounded-full px-1.5 text-sm">
+                  <span
+                    onClick={handleNotification}
+                    className="absolute right-0 top-[-6px] text-white bg-red-600 rounded-full px-1.5 text-sm"
+                  >
                     {unread}
                   </span>
                 )}

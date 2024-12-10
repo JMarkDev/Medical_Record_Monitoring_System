@@ -55,8 +55,10 @@ const Login = ({ modal, closeModal, openRegister }) => {
           let path = "";
           if (role === rolesList.admin) {
             path = "/admin-dashboard";
-          } else {
-            path = "/slaughterhouse-dashboard";
+          } else if (role === rolesList.doctor) {
+            path = "/doctor-dashboard";
+          } else if (role === rolesList.nurse) {
+            path = "/nurse-dashboard";
           }
           navigate(path);
         }

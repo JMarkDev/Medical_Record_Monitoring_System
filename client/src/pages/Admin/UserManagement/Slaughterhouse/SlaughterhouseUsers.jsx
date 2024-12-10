@@ -6,7 +6,7 @@ import Pagination from "../../../../components/Pagination";
 import {
   getAllUsers,
   fetchUsers,
-  searchSlaughterhouseRole,
+  // searchSlaughterhouseRole,
 } from "../../../../services/usersSlice";
 import UserTable from "../../../../components/table/UserTable";
 import rolesList from "../../../../constants/rolesList";
@@ -31,13 +31,13 @@ const Slaughterhouse = () => {
     setShowModal(modal);
   };
 
-  useEffect(() => {
-    if (searchTerm) {
-      dispatch(searchSlaughterhouseRole(searchTerm));
-    } else {
-      dispatch(fetchUsers(rolesList?.supervisor));
-    }
-  }, [searchTerm, dispatch]);
+  // useEffect(() => {
+  //   if (searchTerm) {
+  //     dispatch(searchSlaughterhouseRole(searchTerm));
+  //   } else {
+  //     dispatch(fetchUsers(rolesList?.supervisor));
+  //   }
+  // }, [searchTerm, dispatch]);
 
   // Paganation
   const indexOfLastDocument = currentPage * dataPerPage;

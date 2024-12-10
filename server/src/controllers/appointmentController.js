@@ -2,6 +2,7 @@ const appointmentModel = require("../models/appointmentModel");
 const date = require("date-and-time");
 const sequelize = require("../config/database");
 const { sendNotification } = require("../utils/successBookAppointment");
+const { Op } = require("sequelize");
 
 const addAppointment = async (req, res) => {
   const {
@@ -125,9 +126,43 @@ const deleteAppointment = async (req, res) => {
   }
 };
 
+const searchAppointment = async (req, res) => {
+  const { doctorId, name } = req.query;
+
+  try {
+    // Build the where clause dynamically
+    const whereClause = {
+      fullName: { [Op.like]: `${name}%` },
+    };
+
+    if (doctorId !== "all") {
+      whereClause.doctorId = doctorId;
+    }
+
+    // Use the dynamically constructed where clause
+    const appointments = await appointmentModel.findAll({ where: whereClause });
+
+    return res.status(200).json(appointments);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+const getAllAppointments = async (req, res) => {
+  try {
+    const appointments = await appointmentModel.findAll();
+    return res.status(200).json(appointments);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   addAppointment,
   getAppointmentByDoctorId,
   updateAppointmentStatus,
   deleteAppointment,
+  searchAppointment,
+  getAllAppointments,
 };
