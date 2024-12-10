@@ -4,7 +4,8 @@ const express = require("express");
 const multer = require("multer");
 const axios = require("axios");
 const { v4: uuidv4 } = require("uuid");
-const ASSEMBLYAI_API_KEY = "0d3941fc3b8c4525b6bfc327a35c1e5d"; // Replace with your actual API Key
+require("dotenv").config();
+const ASSEMBLYAI_API_KEY = process.env.ASSEMBLYAI_API_KEY;
 
 if (!ASSEMBLYAI_API_KEY) {
   console.error("AssemblyAI API key is missing. Add it to .env file.");
