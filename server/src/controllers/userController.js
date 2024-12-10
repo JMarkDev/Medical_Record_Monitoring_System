@@ -8,6 +8,7 @@ const saltsRounds = 10;
 const otpController = require("./otpController");
 const { sendNotification } = require("../utils/emailNotifications");
 const sequelize = require("../config/database");
+const rolesList = require("../constants/rolesList");
 
 const getUserByEmail = async (req, res) => {
   const { email } = req.query;
@@ -373,6 +374,23 @@ const updateEmail = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await userModel.findAll({
+      where: {
+        [Op.or]: [
+          { status: statusList.verified },
+          { status: statusList.approved },
+        ],
+      },
+    });
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getUserByEmail,
   getUserById,
@@ -385,4 +403,5 @@ module.exports = {
   updateProfile,
   updateEmail,
   approvedAccount,
+  getAllUsers,
 };

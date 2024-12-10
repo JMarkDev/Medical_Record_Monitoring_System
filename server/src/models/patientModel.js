@@ -1,9 +1,12 @@
 const sequelize = require("../config/database");
 const { DataTypes } = require("sequelize");
-const MedicalHistory = require("./medicalHistoryModel");
 const LabResult = require("./labResultModel");
-const Treatment = require("./treatmentModel");
-const VitalSigns = require("./vitalSignModel");
+const Vital = require("./vitalModel");
+const Prescription = require("./prescriptionModel");
+const Medication = require("./medicationModel");
+const User = require("./userModel");
+const Diagnosis = require("./diagnosisModel");
+const Bladder_BowelModel = require("./bladder_bowelModel");
 
 const Patient = sequelize.define(
   "Patient",
@@ -65,25 +68,37 @@ const Patient = sequelize.define(
   }
 );
 
-Patient.hasMany(MedicalHistory, { foreignKey: "patientId" });
-MedicalHistory.belongsTo(Patient, { foreignKey: "patientId" });
-
-Patient.hasMany(LabResult, { foreignKey: "patientId" });
+// Patient and LabResult Relationship
+Patient.hasMany(LabResult, { foreignKey: "patientId", onDelete: "CASCADE" });
 LabResult.belongsTo(Patient, { foreignKey: "patientId" });
 
-Treatment.belongsTo(Patient, {
-  foreignKey: "patientId",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-Patient.hasMany(Treatment, {
-  foreignKey: "patientId",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-
 // // Relationships
-Patient.hasMany(VitalSigns, { foreignKey: "patientId" });
-VitalSigns.belongsTo(Patient, { foreignKey: "patientId" });
+Patient.hasMany(Vital, { foreignKey: "patientId" });
+Vital.belongsTo(Patient, { foreignKey: "patientId" });
+
+// Relationships
+// Prescription.hasMany(Medication, {
+//   foreignKey: "prescriptionId",
+//   onDelete: "CASCADE",
+// });
+// Medication.belongsTo(Prescription, { foreignKey: "prescriptionId" });
+
+Patient.hasMany(Diagnosis, { foreignKey: "patientId", onDelete: "CASCADE" });
+Diagnosis.belongsTo(Patient, { foreignKey: "patientId" });
+
+Patient.hasMany(Prescription, { foreignKey: "patientId", onDelete: "CASCADE" });
+Prescription.belongsTo(Patient, { foreignKey: "patientId" });
+
+Medication.belongsTo(Patient, { foreignKey: "patientId" }); // Medication belongs to a patient
+Patient.hasMany(Medication, { foreignKey: "patientId" }); // A patient can have multiple medications
+
+Patient.hasMany(Bladder_BowelModel, {
+  foreignKey: "patientId",
+  onDelete: "CASCADE",
+});
+Bladder_BowelModel.belongsTo(Patient, { foreignKey: "patientId" });
+
+// User.hasMany(Prescription, { foreignKey: "doctorId", onDelete: "CASCADE" });
+// Prescription.belongsTo(User, { foreignKey: "doctorId" });
 
 module.exports = Patient;

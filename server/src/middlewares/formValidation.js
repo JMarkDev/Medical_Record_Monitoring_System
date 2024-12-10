@@ -169,6 +169,17 @@ const patientValidationRules = () => {
   ];
 };
 
+const addVitalsValidationRules = () => {
+  return [
+    validateRequiredField("patientId"),
+    validateRequiredField("nurseId"),
+    validateRequiredField("nurseName"),
+    validateRequiredField("bloodPressure"),
+    validateRequiredField("bodyTemperature"),
+    validateRequiredField("heartRate"),
+  ];
+};
+
 const handleValidationErrors = (req, res, next) => {
   // Collect all validation errors
   const errors = validationResult(req);
@@ -215,4 +226,5 @@ module.exports = {
   validateForgotPassword,
   updateProfileValidation,
   patientValidationRules,
+  addVitalsValidationRules,
 };

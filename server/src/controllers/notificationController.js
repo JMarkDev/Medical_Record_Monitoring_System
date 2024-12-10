@@ -7,20 +7,34 @@ const userModel = require("../models/userModel");
 const rolesList = require("../constants/rolesList");
 const statusList = require("../constants/statusList");
 
-const addNotification = async ({ document_id, content, user_id }) => {
+const addNotification = async ({ content }) => {
   try {
     const createdAt = new Date();
-    const formattedDate = date.format(createdAt, "YYYY-MM-DD HH:mm:ss");
+    const formattedDate = date.format(createdAt, "YYYY-MM-DD HH:mm:ss", true); // true for UTC time;
 
-    const newNotification = await notificationModel.create({
-      document_id,
-      content,
-      user_id,
-      is_read: 0,
-      createdAt: sequelize.literal(`'${formattedDate}'`),
+    const nurses = await userModel.findAll({
+      where: { role: rolesList.nurse, status: statusList.approved },
     });
 
-    return newNotification; // Return the created notification
+    await Promise.all(
+      nurses.map(async (nurse) => {
+        await notificationModel.create({
+          user_id: nurse.id,
+          message: content,
+          is_read: 0,
+          createdAt: sequelize.literal(`'${formattedDate}'`),
+        });
+      })
+    );
+
+    // const newNotification = await notificationModel.create({
+    //   content,
+    //   user_id,
+    //   is_read: 0,
+    //   createdAt: sequelize.literal(`'${formattedDate}'`),
+    // });
+
+    return true; // Return the created notification
   } catch (err) {
     throw new Error(err.message); // Throw an error if something goes wrong
   }

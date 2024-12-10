@@ -1,7 +1,7 @@
 const otpModel = require("../models/otpModel");
 const { generatedOTP } = require("./generatedOTP");
 const { sendEmail } = require("./sendEmail");
-const { AUTH_EMAIL } = process.env;
+// const { AUTH_EMAIL } = process.env;
 const bcrypt = require("bcryptjs");
 const saltRounds = 10;
 // const { createdAt, expiresAt } = require("../utils/formattedTime");
@@ -23,7 +23,7 @@ const sendOTP = async ({ email, subject, message, duration = 1 }) => {
 
     //send email
     const mailOptions = {
-      from: AUTH_EMAIL,
+      from: "medicalrecordsmonitoringsystem@gmail.com",
       to: email,
       subject,
       html: `

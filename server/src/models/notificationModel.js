@@ -13,23 +13,23 @@ const Notification = sequelize.define(
     },
     doctorId: {
       type: DataTypes.STRING(55),
-      allowNull: false,
+      allowNull: true,
     },
     nurseId: {
       type: DataTypes.STRING(55),
-      allowNull: false,
+      allowNull: true,
     },
     adminId: {
       type: DataTypes.STRING(55),
-      allowNull: false,
+      allowNull: true,
     },
     message: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    ownerName: {
-      type: DataTypes.STRING(55),
-      allowNull: false,
+    name: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
     },
     user_id: {
       type: DataTypes.INTEGER,

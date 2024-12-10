@@ -15,5 +15,7 @@ router.delete(
   "/delete-appointment/:id",
   appointmentController.deleteAppointment
 );
+router.get("/search-appointment", appointmentController.searchAppointment);
+router.get("/get-all", appointmentController.getAllAppointments);
 
 module.exports = router;

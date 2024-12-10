@@ -1,10 +1,12 @@
 const patientModel = require("../models/patientModel");
 const date = require("date-and-time");
 const sequelize = require("../config/database");
-const medicalHistoryModel = require("../models/medicalHistoryModel");
 const labResultModel = require("../models/labResultModel");
-const treatmentModel = require("../models/treatmentModel");
+const medicationModel = require("../models/medicationModel");
 const vitalModel = require("../models/vitalModel");
+const diagnosisModel = require("../models/diagnosisModel");
+const prescriptionModel = require("../models/prescriptionModel");
+const Bladder_BowelModel = require("../models/bladder_bowelModel");
 const { Op } = require("sequelize");
 
 const addPatient = async (req, res) => {
@@ -51,10 +53,11 @@ const addPatient = async (req, res) => {
 const getAllPatients = async (req, res) => {
   const { status } = req.query;
   const includeModels = [
-    { model: medicalHistoryModel },
     { model: labResultModel },
-    { model: treatmentModel },
+    { model: medicationModel },
     { model: vitalModel },
+    { model: diagnosisModel },
+    { model: Bladder_BowelModel },
   ];
 
   let whereCondition;
@@ -186,10 +189,12 @@ const getPatientById = async (req, res) => {
     const patient = await patientModel.findOne({
       where: { id },
       include: [
-        { model: medicalHistoryModel },
         { model: labResultModel },
-        { model: treatmentModel },
+        { model: medicationModel },
         { model: vitalModel },
+        { model: diagnosisModel },
+        { model: prescriptionModel },
+        { model: Bladder_BowelModel },
       ],
     });
 
@@ -236,6 +241,51 @@ const searchPatient = async (req, res) => {
   }
 };
 
+const filterPatient = async (req, res) => {
+  const { startDate, endDate, gender, status, patientName } = req.query;
+  const whereCondition = {};
+
+  if (startDate && endDate) {
+    whereCondition.createdAt = {
+      [Op.between]: [startDate, endDate],
+    };
+  }
+
+  if (gender) {
+    whereCondition.gender = gender;
+  }
+
+  if (status) {
+    whereCondition.status = status;
+  }
+
+  if (patientName) {
+    whereCondition[Op.or] = [
+      { firstName: { [Op.like]: `${patientName}%` } },
+      { lastName: { [Op.like]: `${patientName}%` } },
+    ];
+  }
+
+  try {
+    const patients = await patientModel.findAll({
+      where: whereCondition,
+      include: [
+        { model: labResultModel },
+        { model: medicationModel },
+        { model: vitalModel },
+        { model: diagnosisModel },
+        { model: prescriptionModel },
+        { model: Bladder_BowelModel },
+      ],
+    });
+
+    return res.status(200).json(patients);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   addPatient,
   getAllPatients,
@@ -244,4 +294,5 @@ module.exports = {
   getPatientById,
   searchPatient,
   updatePatientStatus,
+  filterPatient,
 };

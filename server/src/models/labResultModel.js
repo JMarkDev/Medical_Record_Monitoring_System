@@ -17,20 +17,28 @@ const LabResult = sequelize.define(
         key: "id",
       },
     },
+    doctorId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
+    },
+    doctorName: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
     testName: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    result: {
-      type: DataTypes.TEXT,
-      allowNull: false,
+    description: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
     },
-    testDate: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-    notes: {
-      type: DataTypes.TEXT,
+    files: {
+      type: DataTypes.JSON,
       allowNull: true,
     },
     createdAt: {

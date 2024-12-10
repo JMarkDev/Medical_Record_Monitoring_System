@@ -14,6 +14,7 @@ const otpController = require("../controllers/otpController");
 // req.query
 //http://localhost:3001/users/get-user?email=jmseroy@gmail.com
 router.get("/get-user", userController.getUserByEmail);
+router.get("/all-user", userController.getAllUsers);
 router.get("/get-user-by-id/:id", userController.getUserById);
 router.get("/get-all-user", userController.getAllUserByRole);
 

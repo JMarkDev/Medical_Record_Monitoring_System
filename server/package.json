@@ -17,6 +17,9 @@
   },
   "dependencies": {
     "@google-cloud/dialogflow": "^6.10.0",
+    "@google-cloud/speech": "^6.7.0",
+    "assemblyai": "^4.8.0",
+    "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cloudinary": "^1.21.0",
@@ -40,6 +43,7 @@
     "sequelize": "^6.37.3",
     "server": "file:",
     "socket.io": "^4.7.5",
+    "stream": "^0.0.3",
     "uuid": "^9.0.1"
   }
 }

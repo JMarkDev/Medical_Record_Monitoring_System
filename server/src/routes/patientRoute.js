@@ -18,5 +18,6 @@ router.delete("/delete-patient/:id", patientController.deletePatient);
 router.get("/get-patient-by-id/:id", patientController.getPatientById);
 router.get("/search-patient", patientController.searchPatient);
 router.put("/update-patient-status/:id", patientController.updatePatientStatus);
+router.get("/filter-patient", patientController.filterPatient);
 
 module.exports = router;
