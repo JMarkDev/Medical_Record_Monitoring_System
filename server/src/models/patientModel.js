@@ -53,6 +53,18 @@ const Patient = sequelize.define(
       allowNull: false,
       defaultValue: "Admitted",
     },
+    admissionReason: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    doctorId: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      // references: {
+      //   model: "users",
+      //   key: "id",
+      // },
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -97,6 +109,9 @@ Patient.hasMany(Bladder_BowelModel, {
   onDelete: "CASCADE",
 });
 Bladder_BowelModel.belongsTo(Patient, { foreignKey: "patientId" });
+
+// Patient.belongsTo(User, { foreignKey: "doctorId", onDelete: "CASCADE" });
+// User.hasMany(Patient, { foreignKey: "doctorId" });
 
 // User.hasMany(Prescription, { foreignKey: "doctorId", onDelete: "CASCADE" });
 // Prescription.belongsTo(User, { foreignKey: "doctorId" });
