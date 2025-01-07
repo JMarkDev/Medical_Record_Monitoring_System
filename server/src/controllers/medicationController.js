@@ -51,7 +51,7 @@ const addMedication = async (req, res) => {
 
     const content = `New medication added for ${patientName}`;
 
-    await addNotification({ content: content }); // Pass nurse ID here
+    await addNotification({ content: content, user: "doctor" }); // Pass nurse ID here
 
     return res.status(201).json({
       status: "success",
@@ -191,7 +191,7 @@ const recordMedication = async (req, res) => {
     });
 
     const content = `New medication added for ${patientName}`;
-    await addNotification({ content: content }); // Pass nurse ID here
+    await addNotification({ content: content, user: "doctor" }); // Pass nurse ID here
 
     return res.status(201).json({
       status: "success",
@@ -235,6 +235,9 @@ const updateMedicationStatus = async (req, res) => {
     const updatedMedication = await medication.update({
       status: status || medication.status,
     });
+
+    const content = `Medication ${status} for ${medication.patientName}`;
+    await addNotification({ content: content, user: "nurse" }); // Pass nurse ID here
 
     return res.status(200).json({
       status: "success",
