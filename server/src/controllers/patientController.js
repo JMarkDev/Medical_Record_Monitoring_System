@@ -20,11 +20,18 @@ const addPatient = async (req, res) => {
     patient_insurance_provider,
     patient_insurance_id,
     status,
+    admissionReason,
+    doctorId,
   } = req.body;
+  // console.log(typeof doctorId);
 
   try {
     const createdAt = new Date();
     const formattedDate = date.format(createdAt, "YYYY-MM-DD HH:mm:ss", true); // true for UTC time;
+    // Parse doctorId into JSON format
+    // const doctorIdJson = Array.isArray(doctorId)
+    //   ? JSON.stringify(doctorId)
+    //   : null;
 
     const newPatient = await patientModel.create({
       firstName,
@@ -36,6 +43,8 @@ const addPatient = async (req, res) => {
       patient_insurance_provider,
       patient_insurance_id,
       status,
+      admissionReason,
+      doctorId: doctorId, // Pass JSON string
       createdAt: sequelize.literal(`'${formattedDate}'`),
     });
 
@@ -96,6 +105,8 @@ const updatePatient = async (req, res) => {
     patient_insurance_provider,
     patient_insurance_id,
     status,
+    admissionReason,
+    doctorId,
   } = req.body;
 
   try {
@@ -117,6 +128,8 @@ const updatePatient = async (req, res) => {
         patient_insurance_provider,
         patient_insurance_id,
         status,
+        admissionReason,
+        doctorId,
       },
       { where: { id } }
     );
@@ -286,6 +299,37 @@ const filterPatient = async (req, res) => {
   }
 };
 
+const getPatientsByDoctorId = async (req, res) => {
+  let { doctorId } = req.params;
+  doctorId = Number(doctorId);
+  if (isNaN(doctorId)) {
+    return res.status(400).json({ message: "Invalid doctorId" });
+  }
+
+  try {
+    const patients = await patientModel.findAll({
+      where: sequelize.literal(
+        `JSON_CONTAINS(\`Patient\`.\`doctorId\`, '"${doctorId}"', '$')`
+      ),
+      include: [
+        { model: labResultModel },
+        { model: medicationModel },
+        { model: vitalModel },
+        { model: diagnosisModel },
+        { model: prescriptionModel },
+        { model: Bladder_BowelModel },
+      ],
+    });
+
+    console.log(patients, "patients");
+
+    return res.status(200).json(patients);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   addPatient,
   getAllPatients,
@@ -295,4 +339,5 @@ module.exports = {
   searchPatient,
   updatePatientStatus,
   filterPatient,
+  getPatientsByDoctorId,
 };
