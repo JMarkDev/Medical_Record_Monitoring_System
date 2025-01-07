@@ -104,6 +104,17 @@ export const filterPatients = createAsyncThunk(
   }
 );
 
+export const fetchPatientByDoctor = createAsyncThunk(
+  "patients/getPatientByDoctor",
+  async ({ doctorId }) => {
+    const response = await axios.get(
+      `/patients/get-patients-by-doctor-id/${doctorId}`
+    );
+    console.log(response.data);
+    return response.data;
+  }
+);
+
 const patientSlice = createSlice({
   name: "patients",
   initialState: {

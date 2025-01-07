@@ -43,7 +43,7 @@ const NavDashboard = ({ handleBurger }) => {
     "/reports": "Reports",
     "/patient-records": "Patient Records",
     "/nurse": "Nurse List",
-    "/doctor": "Doctor List",
+    "/doctor-dashboard": "Doctor Dashboard",
     "/admin": "Admin List",
     "/user-details": "User Details",
   };

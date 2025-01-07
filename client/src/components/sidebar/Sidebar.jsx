@@ -37,11 +37,11 @@ const Sidebar = ({ sidebar, handleBurger }) => {
       path: "/patient-records",
       src: <HiOutlineClipboardDocumentList />,
     },
-    {
-      title: "Appointments",
-      path: "/admin-appointments",
-      src: <MdEventAvailable />,
-    },
+    // {
+    //   title: "Appointments",
+    //   path: "/admin-appointments",
+    //   src: <MdEventAvailable />,
+    // },
     {
       title: "User Management",
       path: "/users",
@@ -70,11 +70,11 @@ const Sidebar = ({ sidebar, handleBurger }) => {
       path: "/doctor/patient-records",
       src: <HiOutlineClipboardDocumentList />,
     },
-    {
-      title: "Appointment",
-      path: "/doctor/appointment",
-      src: <MdEventAvailable />,
-    },
+    // {
+    //   title: "Appointment",
+    //   path: "/doctor/appointment",
+    //   src: <MdEventAvailable />,
+    // },
     {
       title: "Prescription",
       path: "/doctor/prescription",

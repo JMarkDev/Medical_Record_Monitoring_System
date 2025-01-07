@@ -8,7 +8,9 @@ import {
   fetchAllPatients,
   searchPatient,
   reset,
+  fetchPatientByDoctor,
 } from "../../../services/patientSlice";
+import { getUserData } from "../../../services/authSlice";
 
 const PatientRecords = () => {
   const dispatch = useDispatch();
@@ -18,10 +20,23 @@ const PatientRecords = () => {
   const dataPerPage = 10;
   const patients = useSelector(getAllPatients);
   const [status, setStatus] = useState("Admitted");
+  const user = useSelector(getUserData);
+  const [doctorId, setDoctorId] = useState(null);
+  const [filteredPatients, setFilteredPatients] = useState([]);
+  console.log(patients);
 
   useEffect(() => {
     dispatch(reset());
-  }, [dispatch]);
+    // dispatch(fetchPatientByDoctor({ doctorId: user?.id }));
+    setDoctorId(user?.id);
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    const filterPatient = patients?.filter((patient) => {
+      return patient?.doctorId?.includes(doctorId);
+    });
+    setFilteredPatients(filterPatient);
+  }, [patients, doctorId]);
 
   useEffect(() => {
     if (status) {
@@ -44,7 +59,7 @@ const PatientRecords = () => {
   // Paganation
   const indexOfLastDocument = currentPage * dataPerPage;
   const indexOfFirstDocument = indexOfLastDocument - dataPerPage;
-  const currentData = patients?.slice(
+  const currentData = filteredPatients?.slice(
     indexOfFirstDocument,
     indexOfLastDocument
   );
@@ -71,7 +86,7 @@ const PatientRecords = () => {
         <div className="flex justify-end mt-5">
           <Pagination
             dataPerPage={dataPerPage}
-            totalData={patients?.length}
+            totalData={filteredPatients?.length}
             paginate={paginate}
             currentPage={currentPage}
           />

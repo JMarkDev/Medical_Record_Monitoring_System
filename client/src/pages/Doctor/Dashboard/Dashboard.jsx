@@ -51,14 +51,31 @@ const SlaughterDashboard = () => {
     (patient) => dateFormatted(patient.createdAt) === dateFormatted(new Date())
   );
 
+  // const cardData = [
+  //   // { title: "Total Patients", value: patients?.length },
+  //   { title: "Total Appointments", value: appointmentList?.length },
+  //   {
+  //     title: "New Appointment (Today)",
+  //     value: todaysPatients.length,
+  //   },
+
+  //   {
+  //     title: "Admitted Patients",
+  //     value: patients?.filter((patient) => patient.status === "Admitted")
+  //       .length,
+  //   },
+  //   {
+  //     title: "Discharged Patients",
+  //     value: patients?.filter((patient) => patient.status === "Discharged")
+  //       .length,
+  //   },
+  // ];
   const cardData = [
-    // { title: "Total Patients", value: patients?.length },
-    { title: "Total Appointments", value: appointmentList?.length },
+    { title: "Total Patients", value: patients?.length },
     {
-      title: "New Appointment (Today)",
+      title: "New Patients (Today)",
       value: todaysPatients.length,
     },
-
     {
       title: "Admitted Patients",
       value: patients?.filter((patient) => patient.status === "Admitted")

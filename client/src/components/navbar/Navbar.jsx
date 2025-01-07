@@ -282,14 +282,14 @@ const Navbar = () => {
                   <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to={"/appointment"}
                   className="p-2.5 bg-primary hover:bg-primary_hover transition-all duration-300 text-white rounded-lg"
                 >
                   Book Appointment
                 </Link>
-              </li>
+              </li> */}
             </>
           )}
         </ul>

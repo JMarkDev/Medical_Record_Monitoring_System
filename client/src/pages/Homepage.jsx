@@ -20,10 +20,11 @@ const Homepage = () => {
               designed for patients and providers alike.
             </p>
             <Link
-              to={"/appointment"}
-              className="rounded-full px-6 py-3 text-lg font-medium border-primary border-2 text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-md"
+              to={"/register"}
+              className="rounded-full px-6 py-1.5 text-lg font-medium border-primary border-2 text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-md"
             >
-              Book Appointment
+              {/* Book Appointment */}
+              Register
             </Link>
           </div>
 

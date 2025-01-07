@@ -12,6 +12,8 @@ import {
   searchPatient,
 } from "../../../services/patientSlice";
 import { useDispatch } from "react-redux";
+import io from "socket.io-client";
+const socket = io.connect(`${api.defaults.baseURL}`);
 
 const AddPrescription = ({ isOpen, onClose, fetchUpdate }) => {
   const toast = useToast();
@@ -97,6 +99,7 @@ const AddPrescription = ({ isOpen, onClose, fetchUpdate }) => {
       const response = await api.post("/prescriptions/add", data);
       if (response.data.status === "success") {
         fetchUpdate();
+        socket.emit("new_notification", response.data);
         toast.success(response.data.message);
         onClose();
       } else {

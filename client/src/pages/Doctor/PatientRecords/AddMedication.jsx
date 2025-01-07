@@ -6,6 +6,8 @@ import api from "../../../api/axios";
 import { useToast } from "../../../hooks/useToast";
 import { getUserData } from "../../../services/authSlice";
 import { useSelector } from "react-redux";
+import io from "socket.io-client";
+const socket = io.connect(`${api.defaults.baseURL}`);
 
 const AddMedicationModal = ({ isOpen, onClose, id, patientName }) => {
   const toast = useToast();
@@ -39,6 +41,7 @@ const AddMedicationModal = ({ isOpen, onClose, id, patientName }) => {
       const response = await api.post("/medications/record-medication", data);
       if (response.data.status === "success") {
         toast.success(response.data.message);
+        socket.emit("new_notification", response.data);
         onClose();
       }
     } catch (error) {

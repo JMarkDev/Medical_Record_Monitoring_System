@@ -46,11 +46,11 @@ function App() {
       path: "/patient-records",
       component: <PatientRecords />,
     },
-    {
-      title: "Appointments",
-      path: "/admin-appointments",
-      component: <AppointmentAdmin />,
-    },
+    // {
+    //   title: "Appointments",
+    //   path: "/admin-appointments",
+    //   component: <AppointmentAdmin />,
+    // },
     { title: "Admin", path: "/admin", component: <Admin /> },
     { title: "Nurse", path: "/nurse", component: <Nurse /> },
     { title: "Doctor", path: "/doctor", component: <Doctor /> },
@@ -93,11 +93,11 @@ function App() {
       path: "/doctor/patient-records",
       component: <DoctorPatientRecords />,
     },
-    {
-      title: "Appointment",
-      path: "/doctor/appointment",
-      component: <DoctorAppointment />,
-    },
+    // {
+    //   title: "Appointment",
+    //   path: "/doctor/appointment",
+    //   component: <DoctorAppointment />,
+    // },
     {
       title: "Prescription",
       path: "/doctor/prescription",
@@ -133,7 +133,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/appointment" element={<Appointment />} />
+        {/* <Route path="/appointment" element={<Appointment />} /> */}
         {/* <Route path="/voice-to-text" element={<VoiceToText />} /> */}
         {/* <Route path="/verify-otp" element={<VerifyOTP />} /> */}
 

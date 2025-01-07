@@ -5,6 +5,8 @@ import PropTypes from "prop-types";
 import { useToast } from "../../../hooks/useToast";
 import Loader from "../../../components/loader/loginloader/LoginLoading";
 import { getUserData } from "../../../services/authSlice";
+import io from "socket.io-client";
+const socket = io.connect(`${api.defaults.baseURL}`);
 
 const AddPrescription = ({ isOpen, onClose, id }) => {
   const toast = useToast();
@@ -57,6 +59,7 @@ const AddPrescription = ({ isOpen, onClose, id }) => {
       const response = await api.post("/prescriptions/add", data);
       if (response.data.status === "success") {
         toast.success(response.data.message);
+        socket.emit("new_notification", response.data);
         onClose();
       } else {
         toast.error(response.data.message || "Failed to add prescription");

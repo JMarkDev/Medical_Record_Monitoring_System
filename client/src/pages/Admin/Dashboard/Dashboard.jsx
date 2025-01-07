@@ -106,13 +106,13 @@ const SlaughterDashboard = () => {
       title: "Total Nurses",
       value: userList?.filter((user) => user.role === rolesList.nurse).length,
     },
-    { title: "Total Appointments", value: appointmentList?.length },
-    {
-      title: "Completed Appointments",
-      value: appointmentList?.filter(
-        (appointment) => appointment.status === "Completed"
-      ).length,
-    },
+    // { title: "Total Appointments", value: appointmentList?.length },
+    // {
+    //   title: "Completed Appointments",
+    //   value: appointmentList?.filter(
+    //     (appointment) => appointment.status === "Completed"
+    //   ).length,
+    // },
   ];
 
   return (

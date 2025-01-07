@@ -19,6 +19,7 @@ import {
   fetchPrescriptionsByStatus,
   searchPrescription,
 } from "../../../services/prescriptionSlice";
+import { getUserData } from "../../../services/authSlice";
 
 const PatientRecords = () => {
   const dispatch = useDispatch();
@@ -29,10 +30,30 @@ const PatientRecords = () => {
   const patients = useSelector(getAllPatients);
   const [status, setStatus] = useState("Admitted");
   const [showAddPrescription, setShowAddPrescription] = useState(false);
+  // const [filteredPatients, setFilteredPatients] = useState([]);
+  const [filteredPrescriptions, setFilteredPrescriptions] = useState([]);
+  const user = useSelector(getUserData);
+  const [doctorId, setDoctorId] = useState(null);
 
   useEffect(() => {
     dispatch(reset());
-  }, [dispatch]);
+    setDoctorId(user?.id);
+  }, [dispatch, user]);
+
+  // useEffect(() => {
+  //   const filterPatient = patients?.filter((patient) => {
+  //     return patient?.doctorId?.includes(doctorId);
+  //   });
+  //   setFilteredPatients(filterPatient);
+  // }, [patients, doctorId]);
+
+  useEffect(() => {
+    const filterPrescription = prescriptions?.filter((prescription) => {
+      return prescription?.doctorId === doctorId;
+    });
+
+    setFilteredPrescriptions(filterPrescription);
+  }, [prescriptions, doctorId]);
 
   useEffect(() => {
     if (status) {
@@ -57,10 +78,10 @@ const PatientRecords = () => {
   // Paganation
   const indexOfLastDocument = currentPage * dataPerPage;
   const indexOfFirstDocument = indexOfLastDocument - dataPerPage;
-  const currentData = patients?.slice(
-    indexOfFirstDocument,
-    indexOfLastDocument
-  );
+  // const currentData = filteredPatients?.slice(
+  //   indexOfFirstDocument,
+  //   indexOfLastDocument
+  // );
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -102,14 +123,14 @@ const PatientRecords = () => {
       <div className="mt-8">
         {/* <UserTable users={currentData} fetchUpdate={fetchUpdate} /> */}
         <PrescriptionTable
-          patients={currentData}
+          // patients={currentData}
           fetchUpdate={fetchUpdate}
-          prescriptions={prescriptions}
+          prescriptions={filteredPrescriptions}
         />
         <div className="flex justify-end mt-5">
           <Pagination
             dataPerPage={dataPerPage}
-            totalData={patients?.length}
+            totalData={filteredPrescriptions?.length}
             paginate={paginate}
             currentPage={currentPage}
           />
