@@ -7,32 +7,59 @@ const userModel = require("../models/userModel");
 const rolesList = require("../constants/rolesList");
 const statusList = require("../constants/statusList");
 
-const addNotification = async ({ content }) => {
+const addNotification = async ({ content, user }) => {
   try {
     const createdAt = new Date();
     const formattedDate = date.format(createdAt, "YYYY-MM-DD HH:mm:ss", true); // true for UTC time;
 
-    const nurses = await userModel.findAll({
-      where: { role: rolesList.nurse, status: statusList.approved },
+    const doctors = await userModel.findAll({
+      where: { role: rolesList.doctor, status: statusList.approved },
     });
 
-    await Promise.all(
-      nurses.map(async (nurse) => {
-        await notificationModel.create({
-          user_id: nurse.id,
-          message: content,
-          is_read: 0,
-          createdAt: sequelize.literal(`'${formattedDate}'`),
-        });
-      })
-    );
+    if (user === "nurse") {
+      await Promise.all(
+        doctors.map(async (doctor) => {
+          await notificationModel.create({
+            user_id: doctor.id,
+            message: content,
+            is_read: 0,
+            createdAt: sequelize.literal(`'${formattedDate}'`),
+          });
+        })
+      );
+    }
 
-    // const newNotification = await notificationModel.create({
-    //   content,
-    //   user_id,
-    //   is_read: 0,
-    //   createdAt: sequelize.literal(`'${formattedDate}'`),
+    if (user === "doctor") {
+      const nurses = await userModel.findAll({
+        where: { role: rolesList.nurse, status: statusList.approved },
+      });
+
+      await Promise.all(
+        nurses.map(async (nurse) => {
+          await notificationModel.create({
+            user_id: nurse.id,
+            message: content,
+            is_read: 0,
+            createdAt: sequelize.literal(`'${formattedDate}'`),
+          });
+        })
+      );
+    }
+
+    // const nurses = await userModel.findAll({
+    //   where: { role: rolesList.nurse, status: statusList.approved },
     // });
+
+    // await Promise.all(
+    //   nurses.map(async (nurse) => {
+    //     await notificationModel.create({
+    //       user_id: nurse.id,
+    //       message: content,
+    //       is_read: 0,
+    //       createdAt: sequelize.literal(`'${formattedDate}'`),
+    //     });
+    //   })
+    // );
 
     return true; // Return the created notification
   } catch (err) {
@@ -40,7 +67,7 @@ const addNotification = async ({ content }) => {
   }
 };
 
-const newRegisterNotification = async ({ name }) => {
+const newRegisterNotification = async ({ role, name }) => {
   try {
     const createdAt = new Date();
     const formattedDate = date.format(createdAt, "YYYY-MM-DD HH:mm:ss", true); // true for UTC time;
@@ -62,7 +89,7 @@ const newRegisterNotification = async ({ name }) => {
     await Promise.all(
       admin?.map(async (admin) => {
         await notificationModel.create({
-          adminId: admin.id,
+          adminId: role,
           user_id: admin.id,
           message: `New user has registered. Please review and approve the account of ${name}.`,
           is_read: 0,
