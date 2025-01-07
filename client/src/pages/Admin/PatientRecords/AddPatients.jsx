@@ -2,10 +2,12 @@ import PropTypes from "prop-types";
 import api from "../../../api/axios";
 import { useForm } from "react-hook-form";
 import LoginLoading from "../../../components/loader/loginloader/LoginLoading";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "../../../hooks/useToast";
 import LocationInput from "../../../components/Location";
 import io from "socket.io-client";
+import { getDoctors, fetchApprovedDoctors } from "../../../services/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
 const socket = io.connect(`${api.defaults.baseURL}`);
 
 const AddPatients = ({ modal, closeModal, fetchUpdate }) => {
@@ -13,6 +15,8 @@ const AddPatients = ({ modal, closeModal, fetchUpdate }) => {
   const { register, handleSubmit } = useForm();
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState("");
+  const dispatch = useDispatch();
+  const doctors = useSelector(getDoctors);
   // Error state for backend validation messages
   const [firstnameError, setFirstnameError] = useState("");
   const [lastnameError, setLastnameError] = useState("");
@@ -22,6 +26,22 @@ const AddPatients = ({ modal, closeModal, fetchUpdate }) => {
   const [dateOfBirthError, setDateOfBirthError] = useState("");
   const [statusError, setStatusError] = useState("");
   const [status, setStatus] = useState("Admitted");
+  const [reasonError, setReasonError] = useState("");
+  const [admissionReason, setAdmissionReason] = useState("");
+  const [customReasonError, setCustomReasonError] = useState("");
+  const [selectedDoctors, setSelectedDoctors] = useState([]);
+
+  const handleDoctorSelection = (doctorId) => {
+    if (selectedDoctors.includes(doctorId)) {
+      setSelectedDoctors(selectedDoctors.filter((id) => id !== doctorId)); // Remove doctor if already selected
+    } else {
+      setSelectedDoctors([...selectedDoctors, doctorId]); // Add doctor to the selected list
+    }
+  };
+
+  useEffect(() => {
+    dispatch(fetchApprovedDoctors());
+  }, [dispatch]);
 
   const handleLocationChange = (location) => {
     setLocation(location);
@@ -37,6 +57,18 @@ const AddPatients = ({ modal, closeModal, fetchUpdate }) => {
     setGenderError("");
     setDateOfBirthError("");
     setStatusError("");
+    setReasonError("");
+
+    if (admissionReason === "Others" && !data.customReason) {
+      setCustomReasonError("Please specify the reason for admission.");
+      setLoading(false);
+      return;
+    }
+
+    // Use customReason if "Others" is selected
+    if (admissionReason === "Others") {
+      data.admissionReason = data.customReason;
+    }
 
     const dateOfBirth = `${data.year}-${String(data.month).padStart(
       2,
@@ -44,6 +76,8 @@ const AddPatients = ({ modal, closeModal, fetchUpdate }) => {
     )}-${String(data.day).padStart(2, "0")}`;
     data.dateOfBirth = dateOfBirth;
     data.address = location;
+    data.doctorId = selectedDoctors;
+    console.log(data);
 
     try {
       const response = await api.post("/patients/add-patient", data);
@@ -384,7 +418,7 @@ const AddPatients = ({ modal, closeModal, fetchUpdate }) => {
                   </div>
                 </div>
 
-                <div className="flex justify-between md:flex-row flex-col gap-5">
+                {/* <div className="flex justify-between md:flex-row flex-col gap-5">
                   <div className="flex flex-col flex-grow mt-4 ">
                     <div className="relative ">
                       <label
@@ -413,6 +447,159 @@ const AddPatients = ({ modal, closeModal, fetchUpdate }) => {
                     {statusError && (
                       <span className="text-red-500">{statusError}</span>
                     )}
+                  </div>
+                </div>
+                 */}
+                <div className="flex justify-between md:flex-row flex-col gap-5">
+                  <div className="flex flex-col flex-grow mt-4">
+                    <div className="relative">
+                      <label
+                        htmlFor="status"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
+                        Status
+                      </label>
+                      <select
+                        {...register("status")}
+                        onChange={(e) => setStatus(e.target.value)}
+                        defaultValue={status}
+                        id="status"
+                        className={`${
+                          statusError ? "border-red-500 " : "border-gray-300 "
+                        } block w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
+                      >
+                        <option value="">Select status</option>
+                        <option value="Admitted">Admitted</option>
+                        <option value="Discharged">Discharged</option>
+                        <option value="Transferred">Transferred</option>
+                      </select>
+                    </div>
+                    {statusError && (
+                      <span className="text-red-500">{statusError}</span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col flex-grow mt-4">
+                    <label
+                      htmlFor="admissionReason"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Reason for Admission
+                    </label>
+                    <select
+                      {...register("admissionReason")}
+                      onChange={(e) => setAdmissionReason(e.target.value)}
+                      id="admissionReason"
+                      className={`${
+                        reasonError ? "border-red-500" : "border-gray-300"
+                      } block w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600`}
+                    >
+                      <option value="">Select reason</option>
+                      <option value="Injury">Injury</option>
+                      <option value="Surgery">Underwent Surgery</option>
+                      <option value="Illness">Illness</option>
+                      <option value="Routine Checkup">Routine Checkup</option>
+                      <option value="Observation">Observation</option>
+                      <option value="Fever">Fever</option>
+                      <option value="Childbirth">Childbirth</option>
+                      <option value="Infection">Infection</option>
+                      <option value="Dehydration">Dehydration</option>
+                      <option value="Fracture">Fracture</option>
+                      <option value="Headache">Severe Headache</option>
+                      <option value="Poisoning">Poisoning</option>
+                      <option value="Heart Attack">Heart Attack</option>
+                      <option value="Respiratory Issues">
+                        Respiratory Issues
+                      </option>
+                      <option value="Allergy">Allergy</option>
+                      <option value="Digestive Problem">
+                        Digestive Problem
+                      </option>
+                      <option value="Others">Others</option>
+                    </select>
+
+                    {reasonError && (
+                      <span className="text-red-500">{reasonError}</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Additional Form for Custom Reason */}
+                {admissionReason === "Others" && (
+                  <div className="flex flex-col flex-grow mt-4">
+                    <label
+                      htmlFor="customReason"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Specify Reason for Admission
+                    </label>
+                    <textarea
+                      {...register("customReason")}
+                      type="text"
+                      id="customReason"
+                      rows={3}
+                      className={`${
+                        customReasonError ? "border-red-500" : "border-gray-300"
+                      } block w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600`}
+                      placeholder="Enter admission reason"
+                    />
+                    {customReasonError && (
+                      <span className="text-red-500">{customReasonError}</span>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex flex-col mt-4">
+                  <label
+                    htmlFor="doctor"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Select Doctors
+                  </label>
+                  <div className="space-y-2">
+                    {doctors?.map((doctor) => (
+                      <div
+                        key={doctor.id}
+                        className="flex items-center justify-between p-2 border-b border-gray-300 rounded-md"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            {...register("doctorId")}
+                            id={`doctor-${doctor.id}`}
+                            value={doctor.id}
+                            checked={selectedDoctors.includes(doctor.id)}
+                            onChange={() => handleDoctorSelection(doctor.id)}
+                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <label
+                            htmlFor={`doctor-${doctor.id}`}
+                            className="text-sm font-medium text-gray-900"
+                          >
+                            Dr. {doctor.firstName} {doctor.middleInitial}.{" "}
+                            {doctor.lastName} - {doctor.specialization} (
+                            {doctor.availability_start_day} to{" "}
+                            {doctor.availability_end_day})
+                          </label>
+                        </div>
+                        {selectedDoctors.includes(doctor.id) && (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-green-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
