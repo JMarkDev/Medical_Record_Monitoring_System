@@ -224,35 +224,65 @@ const PatientDetails = () => {
           Clinical Observations
         </h2>
         {patient?.vitals && patient?.vitals.length > 0 ? (
-          <ul className="mt-4 grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 w-full  gap-5">
-            {patient?.vitals.map((vital, index) => (
-              <li
-                key={index}
-                className="border p-4 text-sm rounded-lg  text-gray-700 bg-gray-50 shadow-sm"
-              >
-                <p>
-                  <span className="font-semibold">Blood Pressure:</span>{" "}
-                  {vital.bloodPressure}
-                </p>
-                <p>
-                  <span className="font-semibold">Body Temperature:</span>{" "}
-                  {vital.bodyTemperature}°C
-                </p>
-                <p>
-                  <span className="font-semibold">Heart Rate:</span>{" "}
-                  {vital.heartRate} BPM
-                </p>
-                <p>
-                  <span className="font-semibold">Nurse:</span>{" "}
-                  {vital.nurseName}
-                </p>
-                <p>
-                  <span className="font-semibold">Date and Time:</span>{" "}
-                  {dateFormat(vital.measurementTime)}
-                </p>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-4 overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 border">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Blood Pressure
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Body Temperature
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Heart Rate
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Nurse
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Date and Time
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {patient?.vitals.map((vital, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      {vital.bloodPressure}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      {vital.bodyTemperature}°C
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      {vital.heartRate} BPM
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      {vital.nurseName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      {dateFormat(vital.measurementTime)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p className="mt-4 text-gray-500">No vital clinical observations.</p>
         )}
